@@ -1,0 +1,12 @@
+# Add your requirements here like:
+# numpy
+# scipy>=0.9
+tweepy
+ws4py
+praw
+git+git://github.com/Supervisor/supervisor
+gdax
+kafka-python
+ciso8601
+nltk
+tweet-preprocessor
