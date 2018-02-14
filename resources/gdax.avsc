@@ -1,8 +1,0 @@
-{"namespace": "gdax.avro",
-"type": "struct",
-"name": "btc_usd",
-"fields": [{"field": "price", "type": "float"},
-         {"field": "volume_24h", "type": "float"},
-         {"field": "spread", "type": "float"},
-         {"field": "timestamp", "type': "float"}]
-}

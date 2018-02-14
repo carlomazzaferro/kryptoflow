@@ -4,10 +4,10 @@ import pymongo
 from kryptoflow.services.utilities.utils import load_conf
 from kryptoflow.models.streamer_base import Streamer
 from pprint import pprint
-from kryptoflow.services.transforms.sent_analysis import TextAnalyzer
+from kryptoflow.services.transforms.sent_analysis import TextAnalyzer, clean_text
 from datetime import datetime
 from time import time
-
+from collections import defaultdict
 
 class RedditStreamer(Streamer):
 
@@ -25,11 +25,10 @@ class RedditStreamer(Streamer):
         super().__init__(topic=topic)
         self.client = praw.Reddit(**load_conf()['reddit'])
         self.analyzer = TextAnalyzer()
-        self._sentence_count = 0
-        self._message = {'sentences': [],
-                         'polarity': 0,
-                         'sentence_count': 0}
         self._last_timestamp = datetime.now().timestamp()
+        self._comment_accumulator = {'sentences': [],
+                                     'sentence_count': 0,
+                                     'polarity': 0}
 
     def as_producer(self):
         pass
@@ -37,43 +36,33 @@ class RedditStreamer(Streamer):
     def cache(self):
         pass
 
-    def start(self):
-        self.stream()
+    def accumulate(self, comment):
+        sentences = list(self.analyzer.sentences(clean_text(comment.body)))
+        self._comment_accumulator['sentences'] += sentences
+        self._comment_accumulator['sentence_count'] += len(sentences)
+        self._comment_accumulator['polarity'] += sum([i['compound'] for i in
+                                                      self.analyzer.sentiment(sentences)])
 
-    def stream(self):
+    def start_stream(self):
         sub_reddit = self.client.subreddit(self.sub_reddits)
         start_time = time()
+        self.timer(5, self._send_and_release)
         for comment in sub_reddit.stream.comments():
             if comment.created_utc < start_time:
                 continue
+            self.accumulate(comment)
 
-            timestamp = comment.created
-            self._message['sentences'] += list(self.analyzer.sentences(comment.body))
-            self._message['sentence_count'] += len(self._message['sentences'])
-            self._message['polarity'] += sum([i['compound'] for i in self.analyzer.sentiment(self._message['sentences'])])
-
-            if timestamp - self._last_timestamp > 5:
-                self.send(self.format_message(self._message))
-                self._release_cache(timestamp)
+    def _send_and_release(self):
+        msssg = self.format_message(self._comment_accumulator)
+        self.send(msssg)
+        self._release_cache()
 
     def format_message(self, msg):
-        msg.update({'timestamp': self.timer.closest_fith})
-
-        msg['sentences'] = ';'.join(msg['sentences'])
-
-        message = {'payload': msg, 'schema': {'type': 'record',
-                                              'name': 'reddit_comments',
-                                              'fields': [{"field": "sentences", "type": "string"},
-                                                         {'field': 'polarity', 'type': 'float'},
-                                                         {'field': 'sentence_count', 'type': 'int'},
-                                                         {'field': 'timestamp', 'type': 'float'}]
-                                              }
-                   }
-        from pprint import pprint
-        pprint(message)
-        return message
+        msg.update({'timestamp': self.time_util.round_no_nearest(),
+                    'sentences': ';'.join(msg['sentences'])})
+        return msg
 
 
 if __name__ == '__main__':
     r = RedditStreamer('reddit')
-    r.start()
+    r.start_stream()

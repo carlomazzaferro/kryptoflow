@@ -4,18 +4,18 @@ from kryptoflow.models.streamer_base import Streamer
 from datetime import datetime
 from pprint import pprint
 import gdax
+from collections import defaultdict
 
 
 class GDAXClient(Streamer, gdax.WebsocketClient):
 
     def __init__(self, topic):
 
-        super(GDAXClient, self).__init__()
-        self.topic = topic
+        super(GDAXClient, self).__init__(topic=topic)
         self._last_timestamp = datetime.now().timestamp()
-        self._price_cache = []
-        self._spread_cache = []
         self.channels = ['ticker']
+        self._accumulator = defaultdict(list)
+        self._last_message = None
 
     def as_producer(self):
         pass
@@ -23,12 +23,29 @@ class GDAXClient(Streamer, gdax.WebsocketClient):
     def cache(self):
         pass
 
-    def stream(self):
-        pass
+    def stream_start(self):
+        self.start()
+
+    @staticmethod
+    def validate_msg(msg):
+        if any([i not in msg.keys() for i in ['price', 'best_ask', 'best_bid']]):
+            return False
+        else:
+            return True
+
+    def accumulate(self, msg):
+        if self.validate_msg(msg):
+            self._accumulator['price_cache'].append(float(msg['price']))
+            self._accumulator['spread_cache'].append(self.calculate_spread(msg))
+            self._accumulator['volume_24h_cache'].append(float(msg['volume_24h']))
 
     def on_open(self):
+
         self.url = "wss://ws-feed.gdax.com/"
         self.products = ["BTC-USD"]
+
+        timer_func = self.timer(5, self._send_and_release)
+        timer_func.start()
         print("Lets count the messages!")
 
     @staticmethod
@@ -39,48 +56,38 @@ class GDAXClient(Streamer, gdax.WebsocketClient):
     def avg(values):
         return sum(values)/len(values)
 
+    def _send_and_release(self):
+        msssg = self.format_message(self._accumulator)
+        self._release_cache()
+        self.send(msssg)
+
     def on_message(self, msg):
-        if 'time' in msg.keys():
-            timestamp = ciso8601.parse_datetime(msg['time']).timestamp()
-            if timestamp - self.timer.last_timestamp > 5:
-                try:
-                    msg['price'] = self.avg(self._price_cache)
-                    msg['spread'] = self.avg(self._spread_cache)
-                except ZeroDivisionError:
-                    msg['spread'] = self.calculate_spread(msg)
+        self.accumulate(msg)
 
-                self.send(self.format_message(msg))
-                self._release_cache(timestamp)
-
-            else:
-                if 'price' in msg.keys():
-                    self._price_cache.append(float(msg['price']))
-                    self._spread_cache.append(self.calculate_spread(msg))
+    def safe_avg(self, message, _key):
+        try:
+            return self.avg(message[_key])
+        except ZeroDivisionError:
+            return self._last_message[_key.replace('_cache', '')]
 
     def format_message(self, message):
-        msg = {'price': float(message['price']),
-               'timestamp': self.timer.closest_fith,
-               'volume_24h': message['volume_24h'],
-               'spread': message['spread']}
 
-        msg = {'payload': msg, 'schema': {'type': 'struct',
-                                          'name': 'btc_usd',
-                                          'fields': [{"field": "price", "type": "float"},
-                                                     {'field': 'volume_24h', 'type': 'float'},
-                                                     {'field': 'spread', 'type': 'float'},
-                                                     {'field': 'timestamp', 'type': 'float'}]
-                                          }
-               }
+        msg = {'price': self.safe_avg(message, 'price_cache'),
+               'timestamp': self.time_util.round_no_nearest(),
+               'volume_24h': self.safe_avg(message, 'volume_24h_cache'),
+               'spread': self.safe_avg(message, 'spread_cache')}
 
+        self._last_message = msg
         return msg
-
-
 
     def on_close(self):
         print("-- Goodbye! --")
 
 
 if __name__ == '__main__':
-
     wsClient = GDAXClient(topic='gdax')
     wsClient.start()
+
+
+# connect-standalone  schema-registry/psql-sql.properties kafka-connect-jdbc/postgres-sink.properties
+# /opt/confluent/etc

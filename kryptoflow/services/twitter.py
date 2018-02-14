@@ -33,13 +33,17 @@ class TwitterStream(Streamer, tweepy.StreamListener):
                          'sentence_count': 0}
         self._last_timestamp = datetime.now().timestamp()
         self.analyzer = TextAnalyzer()
+        self._tweet_accumulator = {'sentences': [],
+                                   'sentence_count': 0,
+                                   'polarity': 0}
 
-    def stream(self):
+    def start(self):
         stream = tweepy.Stream(self.auth, self)
         stream.filter(track=['Bitcoin', 'Ethereum', 'Crypto'])
 
-    def start(self):
-        self.stream()
+    def stream_start(self):
+        self.timer(5, self._send_and_release)
+        self.start()
 
     def cache(self):
         pass
@@ -47,45 +51,43 @@ class TwitterStream(Streamer, tweepy.StreamListener):
     def as_producer(self):
         pass
 
+    def accumulate(self, text):
+        sentences = list(self.analyzer.sentences(text))
+        self._tweet_accumulator['sentences'] += sentences
+        self._tweet_accumulator['sentence_count'] += len(sentences)
+        self._tweet_accumulator['polarity'] += sum([i['compound'] for i in
+                                                      self.analyzer.sentiment(sentences)])
+
+    def _send_and_release(self):
+        msssg = self.format_message(self._tweet_accumulator)
+        self.send(msssg)
+        self._release_cache()
+
     def on_data(self, data):
         all_data = json.loads(data)
         text = all_data['text']
+        if flags(all_data):
+            return None
         if all_data['user']['followers_count'] > 450:
             if 'extended_tweet' in all_data.keys():
                 text = all_data['extended_tweet']['full_text']
-            if not flags(all_data):
-                text = clean_text(text)
-                timestamp = float(all_data['timestamp_ms'])/1000
-                self._message['sentences'] += list(self.analyzer.sentences(text))
-                self._message['sentence_count'] += len(self._message['sentences'])
-                self._message['polarity'] += sum([i['compound'] for i in self.analyzer.sentiment(self._message['sentences'])])
 
-                if timestamp - self.timer.last_timestamp > 5:
-                    self.send(self.format_message(self._message))
-                    self._release_cache(timestamp)
+        if len(text) < 5:
+            return None
 
-        return True
+        self.accumulate(clean_text(text))
 
     def on_error(self, status):
         print(status)
 
     def format_message(self, msg):
         msg['sentences'] = ';'.join(msg['sentences'])
-        msg.update({'timestamp': self.timer.closest_fith})
-
-        message = {'payload': msg, 'schema': {'type': 'record',
-                                              'name': 'tweets',
-                                              'fields': [{"field": "sentences", "type": "string"},
-                                                         {'field': 'polarity', 'type': 'float'},
-                                                         {'field': 'sentence_count', 'type': 'int'},
-                                                         {'field': 'timestamp', 'type': 'float'}]
-                                              }
-                   }
+        msg.update({'timestamp': self.time_util.round_no_nearest()})
         return msg
 
 
 if __name__ == '__main__':
 
     tweet_stream = TwitterStream(topic='twitter')
-    tweet_stream.start()
+    tweet_stream.stream_start()
 
