@@ -7,6 +7,5 @@ praw
 git+git://github.com/Supervisor/supervisor
 gdax
 kafka-python
-ciso8601
 nltk
 tweet-preprocessor
