@@ -39,7 +39,7 @@ supervisorctl -c resources/supervisord.conf
 
 1. Docker
 2. python3.6
-3. `pip install requirements.txt`
+3. `pip install -r requirements.txt`
 
 You're set. Connect to `timescaledb` using any Postgres enabled client using 
 ```bash
