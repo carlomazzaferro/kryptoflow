@@ -3,7 +3,6 @@ from kryptoflow.services.utilities.utils import load_conf
 from kryptoflow.models.streamer_base import Streamer
 import json
 from datetime import datetime
-from pprint import pprint
 from kryptoflow.services.transforms.sent_analysis import TextAnalyzer, clean_text
 
 
