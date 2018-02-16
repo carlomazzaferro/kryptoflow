@@ -23,8 +23,12 @@ class GDAXClient(Streamer, gdax.WebsocketClient):
     def cache(self):
         pass
 
-    def stream_start(self):
-        self.start()
+    def start_stream(self):
+        try:
+            self.start()
+        except Exception as e:
+            print('ERRROR', e)
+            self.start_stream()
 
     @staticmethod
     def validate_msg(msg):
@@ -73,7 +77,7 @@ class GDAXClient(Streamer, gdax.WebsocketClient):
     def format_message(self, message):
 
         msg = {'price': self.safe_avg(message, 'price_cache'),
-               'timestamp': self.time_util.round_no_nearest(),
+               'ts': str(datetime.fromtimestamp(self.time_util.round_to_nearest())),
                'volume_24h': self.safe_avg(message, 'volume_24h_cache'),
                'spread': self.safe_avg(message, 'spread_cache')}
 
@@ -86,7 +90,7 @@ class GDAXClient(Streamer, gdax.WebsocketClient):
 
 if __name__ == '__main__':
     wsClient = GDAXClient(topic='gdax')
-    wsClient.start()
+    wsClient.start_stream()
 
 
 # connect-standalone  schema-registry/psql-sql.properties kafka-connect-jdbc/postgres-sink.properties

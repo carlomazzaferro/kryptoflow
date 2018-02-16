@@ -1,11 +1,9 @@
 import abc
-import json
 from kryptoflow.services.utilities.utils import TimeUtils, RepeatedTimer
 from kryptoflow.definitions import SCHEMAS
 import os
 from confluent_kafka import avro
 from confluent_kafka.avro import AvroProducer
-from pprint import pprint
 from collections import defaultdict
 
 
@@ -34,8 +32,10 @@ class Streamer(abc.ABC):
         return
 
     def send(self, message):
-        pprint(message)
+        message['ts'] = str(message['ts'])
+        print(message)
         self.producer.produce(topic=self.topic, value=message)  #, key=message.keys())
+        self.producer.flush()
 
     def _release_cache(self):
         self._accumulator = defaultdict(list)

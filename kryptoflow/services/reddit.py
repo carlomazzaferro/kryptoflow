@@ -9,6 +9,7 @@ from datetime import datetime
 from time import time
 from collections import defaultdict
 
+
 class RedditStreamer(Streamer):
 
     sub_reddits = '+'.join([
@@ -47,10 +48,14 @@ class RedditStreamer(Streamer):
         sub_reddit = self.client.subreddit(self.sub_reddits)
         start_time = time()
         self.timer(5, self._send_and_release)
-        for comment in sub_reddit.stream.comments():
-            if comment.created_utc < start_time:
-                continue
-            self.accumulate(comment)
+        try:
+            for comment in sub_reddit.stream.comments():
+                if comment.created_utc < start_time:
+                    continue
+                self.accumulate(comment)
+        except Exception as e:
+            print('ERRROR', e)
+            self.start_stream()
 
     def _send_and_release(self):
         msssg = self.format_message(self._comment_accumulator)
@@ -58,7 +63,7 @@ class RedditStreamer(Streamer):
         self._release_cache()
 
     def format_message(self, msg):
-        msg.update({'timestamp': self.time_util.round_no_nearest(),
+        msg.update({'ts': str(datetime.fromtimestamp(self.time_util.round_to_nearest())),
                     'sentences': ';'.join(msg['sentences'])})
         return msg
 
