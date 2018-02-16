@@ -1,13 +1,9 @@
 import praw
-import json
-import pymongo
 from kryptoflow.services.utilities.utils import load_conf
 from kryptoflow.models.streamer_base import Streamer
-from pprint import pprint
 from kryptoflow.services.transforms.sent_analysis import TextAnalyzer, clean_text
 from datetime import datetime
 from time import time
-from collections import defaultdict
 
 
 class RedditStreamer(Streamer):
