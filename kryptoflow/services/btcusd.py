@@ -1,8 +1,5 @@
-import time
-import ciso8601
 from kryptoflow.models.streamer_base import Streamer
 from datetime import datetime
-from pprint import pprint
 import gdax
 from collections import defaultdict
 
@@ -92,6 +89,4 @@ if __name__ == '__main__':
     wsClient = GDAXClient(topic='gdax')
     wsClient.start_stream()
 
-
-# connect-standalone  schema-registry/psql-sql.properties kafka-connect-jdbc/postgres-sink.properties
-# /opt/confluent/etc
+c

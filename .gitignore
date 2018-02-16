@@ -43,3 +43,7 @@ MANIFEST
 
 # secrets
 resources/*
+
+# supervisor
+*.pid
+*.log
