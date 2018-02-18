@@ -42,14 +42,20 @@ Now you are inside the container, which contains all the code from the repo. Run
 Starts each service. Alternatively, run `supervisord -c resources/supervisord.conf`, and check the status
 by running `supervisorctl -c resources/supervisord.conf`
 
+### Services, without Docker (MacOS)
 
-### Dependencies
+## Dependencies
 
-1. Docker
-2. python3.6
+1. python3.6
+2. librdkafka: `brew install librdkafka`
 3. `pip install -r requirements.txt`
+4. `pip install -e .`
 
-You're set. Connect to `timescaledb` using any Postgres enabled client using 
+Then, run `supervisord -c resources/supervisord.conf`
+
+###  Analysis
+Connect to `timescaledb` using any Postgres enabled client using: 
+
 ```bash
 psql -h localhost -U postgres
 ```
