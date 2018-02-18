@@ -5,6 +5,8 @@ services:
     image: timescale/timescaledb
     ports:
       - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: Kryptoflow3325*
 
 
   lenses:
@@ -18,13 +20,12 @@ services:
       - "9582:9582"
       - "9584:9584"
       - "9585:9585"
+    volumes:
+      - './resources/connector/psql-sql.properties:/opt/confluent/etc/schema-registry/psql-sql.properties'
+      - './resources/connector/postgres-sink.properties:/opt/confluent/etc/kafka-connect-jdbc/postgres-sink.properties'
     environment:
       - EULA=https://dl.lenses.stream/d/?id=821aa747-6596-4efb-bade-079733e1c9d9
       - ADV_HOST=127.0.0.1
       - SAMPLEDATA=0
     links:
       - "timescale-psql:database"
-
-
-# docker run -d --name some-timescaledb -p 5432:5432 timescale/timescaledb
-# docker run -it --rm --link some-timescaledb:timescaledb timescale/timescaledb psql -h timescaledb -U postgres

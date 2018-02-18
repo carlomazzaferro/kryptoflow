@@ -22,13 +22,16 @@ class GDAXClient(Streamer, gdax.WebsocketClient):
 
     def start_stream(self):
         try:
+            self.channels = ['ticker']
             self.start()
         except Exception as e:
             print('ERRROR', e)
+            self.channels = ['ticker']
             self.start_stream()
 
     @staticmethod
     def validate_msg(msg):
+        print(msg.keys())
         if any([i not in msg.keys() for i in ['price', 'best_ask', 'best_bid']]):
             return False
         else:
@@ -41,8 +44,7 @@ class GDAXClient(Streamer, gdax.WebsocketClient):
             self._accumulator['volume_24h_cache'].append(float(msg['volume_24h']))
 
     def on_open(self):
-
-        self.url = "wss://ws-feed.gdax.com/"
+        self.url = "wss://ws-feed.gdax.com/ticker"
         self.products = ["BTC-USD"]
 
         timer_func = self.timer(5, self._send_and_release)
@@ -63,6 +65,7 @@ class GDAXClient(Streamer, gdax.WebsocketClient):
         self.send(msssg)
 
     def on_message(self, msg):
+        print(msg)
         self.accumulate(msg)
 
     def safe_avg(self, message, _key):
@@ -88,5 +91,3 @@ class GDAXClient(Streamer, gdax.WebsocketClient):
 if __name__ == '__main__':
     wsClient = GDAXClient(topic='gdax')
     wsClient.start_stream()
-
-c

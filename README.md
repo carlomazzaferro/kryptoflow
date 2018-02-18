@@ -15,18 +15,28 @@ Run
 ### Infrastructure: kafka, timescaledb, kafka connectors
 ```bash
 docker-compose up
-docker-compose run timescale-psql
 
 
-docker cp resources/connector/psql-sql.properties kryptoflow_lenses_1:/opt/confluent/etc/schema-registry/
-docker cp resources/connector/postgres-sink.properties kryptoflow_lenses_1:/opt/confluent/etc/kafka-connect-jdbc/postgres-sink.properties
-
+# runs connector between kafka and timesclae
 docker exec -it kryptoflow_lenses_1 connect-standalone /opt/confluent/etc/schema-registry/psql-sql.properties /opt/confluent/etc/kafka-connect-jdbc/postgres-sink.properties
+
+
+# builds image that hosts application
+docker build -t kryptoflow .
+docker exec -it kryptoflow bash 
 ```
+Now you are inside the container, which contains all the code from the repo. Running:
+
+`python3.6 kryptoflow/services/reddit.py`
+`python3.6 kryptoflow/services/twitter.py`
+`python3.6 kryptoflow/services/btcusd.py`
+
+Starts each service. Alternatively, run `supervisord -c resources/supervisord.conf`, and check the status
+by running `supervisorctl -c resources/supervisord.conf`
 
 ### Services
 ```bash
-supervisord -c resources/supervisor.conf
+
 ```
 To check processes are running:
 
