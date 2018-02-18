@@ -46,6 +46,7 @@ class RedditStreamer(Streamer):
         self.timer(5, self._send_and_release)
         try:
             for comment in sub_reddit.stream.comments():
+                print(comment)
                 if comment.created_utc < start_time:
                     continue
                 self.accumulate(comment)
