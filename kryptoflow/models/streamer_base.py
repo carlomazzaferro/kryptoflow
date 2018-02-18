@@ -33,7 +33,6 @@ class Streamer(abc.ABC):
 
     def send(self, message):
         message['ts'] = str(message['ts'])
-        print(message)
         self.producer.produce(topic=self.topic, value=message)  #, key=message.keys())
         self.producer.flush()
 
