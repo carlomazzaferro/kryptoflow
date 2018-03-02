@@ -8,7 +8,6 @@ services:
     environment:
       POSTGRES_PASSWORD: Kryptoflow3325*
 
-
   lenses:
     image: landoop/kafka-lenses-dev
     ports:
