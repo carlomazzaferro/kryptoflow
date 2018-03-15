@@ -2,6 +2,7 @@ import json
 import math
 from kryptoflow.definitions import CONFIG_PATH
 from datetime import datetime, time
+import time as t
 from threading import Timer
 from kryptoflow.definitions import TIMEFRAME
 
@@ -67,3 +68,9 @@ class RepeatedTimer(object):
     def stop(self):
         self._timer.cancel()
         self.is_running = False
+
+
+def utc_to_local(utc_datetime):
+    now_timestamp = t.time()
+    offset = datetime.fromtimestamp(now_timestamp) - datetime.utcfromtimestamp(now_timestamp)
+    return utc_datetime + offset
