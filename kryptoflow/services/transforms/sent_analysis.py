@@ -7,7 +7,7 @@ import preprocessor as p
 
 
 def clean_text(text):
-    p.set_options(p.OPT.URL, p.OPT.MENTION, p.OPT.NUMBER)
+    p.set_options(p.OPT.URL, p.OPT.MENTION, p.OPT.NUMBER, p.OPT.HASHTAG)
 
     text = p.clean(re.sub(r'RT\s?:?', '', text, flags=re.IGNORECASE))
     text = text.replace(':', '')
