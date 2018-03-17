@@ -1,6 +1,7 @@
 import gdax
 from datetime import datetime
 from kryptoflow.models.streamer_base import AvroAsync
+from kryptoflow.services.utilities.utils import utc_to_local
 
 
 class GDAXClient(gdax.WebsocketClient):
@@ -18,6 +19,7 @@ class GDAXClient(gdax.WebsocketClient):
         else:
             message = self._format_message(message)
             self.producer.produce(topic=self.topic, value=message)
+
             self.producer.flush()
 
     def start_stream(self):
@@ -44,10 +46,15 @@ class GDAXClient(gdax.WebsocketClient):
 
     def _format_message(self, message):
         msg = {'price': float(message['price']),
-               'ts': str(datetime.strptime(message['time'], "%Y-%m-%dT%H:%M:%S.%fZ")),
+               'ts': str(
+                   utc_to_local(
+                       datetime.strptime(message['time'], "%Y-%m-%dT%H:%M:%S.%fZ").replace(microsecond=0)
+                   )
+               ),
                'volume_24h': float(message['volume_24h']),
                'spread': self.calculate_spread(message),
                'side': message['side']}
+        print(msg)
 
         return msg
 
