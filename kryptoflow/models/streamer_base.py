@@ -57,8 +57,12 @@ class AvroAsync(object):
         while True:
             counter += 1
             msg = c.poll()
-            print(msg.value())
-            print(a)
+            # print(msg.value())
+            print(msg)
+
+
+    def persist_locally(self, path, message, topic):
+        pass
 
 
 if __name__ == '__main__':
