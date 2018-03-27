@@ -57,6 +57,13 @@ class ForecastTransformer(BaseEstimator, TransformerMixin):
 class TimeEmbedder(BaseEstimator, TransformerMixin):
 
     def __init__(self, inital_dims):
+        """
+        Transform to a time-embedded array from a single long array. I.e., group features into their
+        buckets so that they actually represent data from related timestamps
+
+        Args:
+            inital_dims (int): initial dimensions of array
+        """
         self.initial_dims = inital_dims
         self.middle_shape = None
 
@@ -103,8 +110,11 @@ def one_hot_encode(df, categ_vars):
 
 if __name__ == '__main__':
 
-    local_df = get_data('gdax', remote=False, keep_keys=['ts', 'price', 'volume_24h', 'spread', 'side'])  # type: pandas.DataFrame
-    remote_df = get_data('gdax', remote=True, keep_keys=['ts', 'price', 'volume_24h', 'spread', 'side'])  # type: pandas.DataFrame
+    local_df = get_data('gdax', remote=False, keep_keys=['ts', 'price', 'volume_24h',
+                                                         'spread', 'side'])  # type: pandas.DataFrame
+
+    remote_df = get_data('gdax', remote=True, keep_keys=['ts', 'price', 'volume_24h',
+                                                         'spread', 'side'])  # type: pandas.DataFrame
 
     pipe = Pipeline([
         ('tr', ForecastTransformer()),
