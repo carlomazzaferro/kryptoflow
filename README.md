@@ -2,29 +2,25 @@ Kryptoflow
 ==========
 
 
-Real-time framework for crypto-related things using Kafka and TimescaleDB
+Real-time framework for crypto-related ML-things using Kafka and TensorFlow ([Keras](https://keras.io/) + [TensorFlow Serving](https://www.tensorflow.org/serving/))
 
 
 Description
 ===========
 
-Coming soon ....
+Coming soon ...
 
 Run
 ===
-### Infrastructure: kafka, timescaledb, kafka connectors
+### Infrastructure: kafka, tensorflow, et. al.
 
-Spin up kafka and timescale
+Spin up kafka and related services (zookeeper, kafka-ui, etc.)
+
 ```bash
 docker-compose up
 ```
 
-Run the connector between both
-```
-docker exec -it kryptoflow_lenses_1 connect-standalone /opt/confluent/etc/schema-registry/psql-sql.properties /opt/confluent/etc/kafka-connect-jdbc/postgres-sink.properties
-```
-
-### Services
+### Services: Data Gathering 
 Build the application code that will gather data and stream it to kafka
 ```
 docker build -t kryptoflow .
@@ -54,11 +50,5 @@ by running `supervisorctl -c resources/supervisord.conf`
 Then, run `supervisord -c resources/supervisord.conf`
 
 ###  Analysis
-Connect to `timescaledb` using any Postgres enabled client using: 
-
-```bash
-psql -h localhost -U postgres
-```
-and begin your analysis.
-
+Check out Keras [training notebook: 
 
