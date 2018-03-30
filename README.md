@@ -2,7 +2,7 @@ Kryptoflow
 ==========
 
 
-Real-time framework for crypto-related ML-things using Kafka and TensorFlow ([Keras](https://keras.io/) + [TensorFlow Serving](https://www.tensorflow.org/serving/))
+Algorithmic crypto trading framework with Kafka and TensorFlow ([Keras](https://keras.io/) + [TensorFlow Serving](https://www.tensorflow.org/serving/))
 
 
 Description
