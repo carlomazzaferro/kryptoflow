@@ -1,17 +1,11 @@
 import json
 from flask_restplus import Resource
-from kryptoflow.serving.api.restplus import api
-from kryptoflow.serving.api.gan.logic.tf_serving_client import make_prediction, _load_and_transform_data
+from kryptoflow.serving.backend.api.restplus import api
+from kryptoflow.serving.backend.api.gan.logic.tf_serving_client import make_prediction, _load_and_transform_data
 
 
 # create dedicated namespace for GAN client
 ns = api.namespace('prediction_client', description='Operations for client predictions')
-
-
-# Flask-RestPlus specific parser for image uploading
-UPLOAD_KEY = 'image'
-UPLOAD_LOCATION = 'files'
-upload_parser = api.parser()
 
 
 @ns.route('/prediction')
