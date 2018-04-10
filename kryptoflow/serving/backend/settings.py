@@ -1,4 +1,5 @@
-from kryptoflow.definitions import TIMEFRAME
+import os
+from kryptoflow.definitions import TIMEFRAME, APP_DIR
 
 # Flask settings
 DEFAULT_FLASK_SERVER_NAME = '0.0.0.0'
@@ -20,3 +21,7 @@ TF_MODEL_INPUTS_KEY = 'states'
 
 # Model Settings
 TIMES_STEPS = TIMEFRAME
+DIST_FILES_DIR = os.path.join(APP_DIR, 'dist')
+STATIC_FILES_DIR = os.path.join(APP_DIR, 'dist/static')
+
+
