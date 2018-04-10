@@ -1,9 +1,7 @@
 import logging
-import traceback
 
 from flask_restplus import Api
-from kryptoflow.serving import settings
-
+from kryptoflow.serving.backend import settings
 
 log = logging.getLogger(__name__)
 
