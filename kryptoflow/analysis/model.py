@@ -1,5 +1,4 @@
-
-from keras.models import Sequential, Model, model_from_config
+from keras.models import Sequential
 from keras.layers import LSTM, Dense
 
 from keras.callbacks import TensorBoard
