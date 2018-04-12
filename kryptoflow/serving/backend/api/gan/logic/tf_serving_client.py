@@ -1,6 +1,5 @@
-import operator
 import logging
-from kryptoflow.serving import settings, utils
+from kryptoflow.serving.backend import utils, settings
 import tensorflow as tf
 import numpy
 

@@ -2,7 +2,7 @@ Kryptoflow
 ==========
 
 
-Real-time framework for crypto-related ML-things using Kafka and TensorFlow ([Keras](https://keras.io/) + [TensorFlow Serving](https://www.tensorflow.org/serving/))
+Algorithmic crypto trading framework with Kafka and TensorFlow ([Keras](https://keras.io/) + [TensorFlow Serving](https://www.tensorflow.org/serving/))
 
 
 Description
@@ -50,5 +50,27 @@ by running `supervisorctl -c resources/supervisord.conf`
 Then, run `supervisord -c resources/supervisord.conf`
 
 ###  Analysis
-Check out Keras [training notebook: 
+Check out Keras [training notebook](https://github.com/carlomazzaferro/kryptoflow/blob/master/keras_training.ipynb)
+for training and model storing instructions
+
+### Deploy with Tensorflow Serving
+
+Build the docker container with bazel, tf serving, and all the required dependencies to
+serve the model. This may take some time (~40 minutes)
+
+```bash
+bash kryptoflow/serving/build_server.sh 
+```
+
+Then, copy the stored models to the container:
+
+```bash
+bash kryptoflow/serving/serve.sh 1
+```
+ 
+The `1` indicates the number of the model. Check `saved_models/` directory for the available
+stored models. These are automatically saved when the class `kryptoflow.analysis.export.ModelExporter` is
+instantiated. See the notebook for more info on how to stored the models themselves.
+
+
 
