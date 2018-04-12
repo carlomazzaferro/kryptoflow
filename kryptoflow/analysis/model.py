@@ -6,7 +6,7 @@ from keras.optimizers import Adam
 
 from time import time
 
-from kryptoflow.serving.export import ModelExporter
+from kryptoflow.analysis.export import ModelExporter
 
 time_steps = 8
 tensorboard = TensorBoard(log_dir="logs/{}".format(time()))
@@ -18,7 +18,6 @@ class KerasModel(object):
         self.input_shape = dims
         self.store = store
         self.model = self.build_model()
-        self.exporter = ModelExporter(self.model)
 
     def build_model(self):
         model = Sequential()
@@ -32,6 +31,3 @@ class KerasModel(object):
         self.model.fit(X, y, epochs=epochs,
                        batch_size=64, verbose=2, validation_data=(x_val, y_val),
                        callbacks=[tensorboard])
-
-    def store_model(self, name):
-        self.exporter.store(name)

@@ -2,7 +2,9 @@ import json
 import pandas
 import numpy
 import os
+from kryptoflow import definitions
 from itertools import chain
+from kryptoflow.models.streamer_base import AvroAsync
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -46,7 +48,7 @@ class ForecastTransformer(BaseEstimator, TransformerMixin):
 
         forecasting = pandas.DataFrame(data, columns=pandas.MultiIndex.from_tuples(self.tuple_index), index=index)
         forecasting[('t_0', 'target')] = forecasting[('t_0', 'target')].shift(-self.pred_steps)
-        if len(forecasting) > 1:
+        if len(forecasting) > 2:
             forecasting = forecasting.dropna()
             return forecasting[:-self.pred_steps].values
         else:
@@ -71,26 +73,35 @@ class TimeEmbedder(BaseEstimator, TransformerMixin):
         self.middle_shape = (X.shape[1]-1)//self.initial_dims
         return self
 
-    def transform(self, X):
+    def transform(self, X, y=None):
         y = X[:, -1]
         X = X[:, :-1]
         return numpy.reshape(X, (X.shape[0], self.middle_shape, self.initial_dims)), y
+
+
+def accumulate_data(time_steps=definitions.TIMEFRAME):
+    consumer = AvroAsync(topic='gdax')
+    messages = consumer.read_new(accumulate=True, n_messages=time_steps, unique=True)
+    return messages
 
 
 def get_data(source, remote=False, keep_keys=list(['ts']),
              categorical=list(['side'])):
     file_path = '/media/carlo/HDD/kafka_local/'
     file_path = os.path.join(file_path, source + '.txt')
-    rows = []
-    with open(file_path) as inf:
-        for i, row in enumerate(inf):
-            if remote:
-                if i >= 8:
-                    break
-            row_dict = json.loads(row)
-            rows.append({k: v for k, v in row_dict.items() if k in keep_keys})
+    if remote:
+        consumer = AvroAsync(topic='gdax')
+        data = consumer.read_new(accumulate=True, n_messages=definitions.TIMEFRAME, unique=True)
+        rows = [{k: v for k, v in msg.items() if k in keep_keys} for msg in data]
 
+    else:
+        rows = []
+        with open(file_path) as inf:
+            for i, row in enumerate(inf):
+                row_dict = json.loads(row)
+                rows.append({k: v for k, v in row_dict.items() if k in keep_keys})
     df = pandas.DataFrame(rows)
+
     df.index = pandas.to_datetime(df['ts'])
     df['ts'] = pandas.to_datetime(df['ts'])
     df['time_diff'] = df['ts'].diff().dt.seconds.div(1, fill_value=0)
