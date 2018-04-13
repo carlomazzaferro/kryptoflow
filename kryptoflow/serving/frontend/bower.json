@@ -1,0 +1,6 @@
+{
+  "name": "frontend",
+  "dependencies": {
+    "materialize": "0.97.6"
+  }
+}
