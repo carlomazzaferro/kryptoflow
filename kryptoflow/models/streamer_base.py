@@ -38,15 +38,15 @@ class AvroAsync(object):
             msg = self.avro_consumer.poll()
             if not msg.error():
                 print(msg.value())
-
                 if accumulate:
                     if len(cache) >= n_messages:
+                        self.avro_consumer.close()
                         return cache
                     if unique:
                         if msg not in cache:
-                            cache.append(msg)
+                            cache.append(msg.value())
                     else:
-                        cache.append(msg)
+                        cache.append(msg.value())
 
             elif msg.error().code() != KafkaError._PARTITION_EOF:
                 print(msg.error())
@@ -55,8 +55,8 @@ class AvroAsync(object):
 
     def read_from_start(self, persist=False, path='/'):
         c = AvroConsumer(dict(self.base_config, **{'group.id': 'groupid',
-                                                   'default.topic.config': {'auto.offset.reset': 'beginning',
-                                                                            'auto.commit.enable': 'false'}
+                                                   'default.topic.config': #{'auto.offset.reset': 'beginning',
+                                                       {'auto.commit.enable': 'false'}
                                                    }
                               )
                          )
@@ -69,35 +69,50 @@ class AvroAsync(object):
         else:
             self.run_loop(c)
 
+    def read_from_offset(self, offset=1000):
+        c = AvroConsumer(dict(self.base_config, **{'group.id': 'groupid-1',
+                                                   'default.topic.config': {'auto.offset.reset': 'beginning',
+                                                                            'auto.commit.enable': 'false'}
+                                                   }
+                              )
+                         )
+
+        c.assign([TopicPartition(self.topic, partition=0, offset=offset)])
+        return self.run_loop(c, return_message=True, file_object=False)
+
     @staticmethod
-    def run_loop(consumer, file_object=None):
+    def run_loop(consumer, file_object=None, return_message=False):
         counter = 0
         msg_stack = []
         last_import = time.time() - 60
         while True:
-            counter += 1
-            msg = consumer.poll()
-            print(msg.timestamp())
-            if file_object:
+            msg = consumer.poll(timeout=3)
+            if file_object or return_message:
                 try:
                     encoded = json.dumps(msg.value())
+                    print(encoded)
                     if encoded not in msg_stack[-10:]:
-                        msg_stack.append(json.dumps(msg.value()))
+                        msg_stack.append(msg.value())
                 except TypeError:
                     print(msg.value())
 
                 if msg.timestamp()[1]/1000 > last_import:
                     break
-
             else:
                 print(msg.value())
 
         if file_object:
             for item in msg_stack:
-                file_object.write(item + '\n')
+                file_object.write(json.dumps(item) + '\n')
+
+        if return_message:
+            return msg_stack
+
+        print(counter)
 
 
 if __name__ == '__main__':
 
     a = AvroAsync(topic='gdax')
-    a.read_from_start(persist=True)
+    msgs = a.read_from_offset(offset=700000)
+    print(len(msgs))
