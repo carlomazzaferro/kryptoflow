@@ -24,7 +24,7 @@ class HistoricData(Resource):
                 500: "Internal server error"
             })
     @ns.expect(parser)
-    def post(self):
+    def get(self):
         try:
             payload = get_historic_data(int(request.args['offset']), max_points=int(request.args['max_points']))
         except Exception as inst:
