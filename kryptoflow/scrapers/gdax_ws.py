@@ -1,7 +1,7 @@
 import gdax
 from datetime import datetime
-from kryptoflow.models.streamer_base import AvroAsync
-from kryptoflow.services.utilities.utils import utc_to_local
+from kryptoflow.common.streamer_base import AvroAsync
+from kryptoflow.scrapers.utilities.utils import utc_to_local
 
 
 class GDAXClient(gdax.WebsocketClient):

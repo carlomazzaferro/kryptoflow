@@ -4,7 +4,7 @@ import numpy
 import os
 from kryptoflow import definitions
 from itertools import chain
-from kryptoflow.models.streamer_base import AvroAsync
+from kryptoflow.common.streamer_base import AvroAsync
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline

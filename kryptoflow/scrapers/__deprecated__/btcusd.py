@@ -1,4 +1,4 @@
-from kryptoflow.models.streamer_base import Streamer
+from kryptoflow.common.streamer_base import Streamer
 from datetime import datetime
 import gdax
 from collections import defaultdict

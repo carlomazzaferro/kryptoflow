@@ -1,4 +1,4 @@
-from kryptoflow.models.streamer_base import AvroAsync
+from kryptoflow.common.streamer_base import AvroAsync
 
 
 def get_historic_data(offset, max_points=50000):

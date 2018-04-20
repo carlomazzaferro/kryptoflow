@@ -1,6 +1,6 @@
 from threading import Thread, Event
 from confluent_kafka import KafkaError
-from kryptoflow.models.streamer_base import AvroAsync
+from kryptoflow.common.streamer_base import AvroAsync
 
 
 thread = Thread()
