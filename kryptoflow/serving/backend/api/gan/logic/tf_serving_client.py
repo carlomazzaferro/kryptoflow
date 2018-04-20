@@ -7,8 +7,8 @@ import numpy
 from grpc.beta import implementations
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
-from kryptoflow.analysis.export import ModelImporter
-from kryptoflow.analysis.dataset import get_data
+from kryptoflow.ml.export import ModelImporter
+from kryptoflow.ml.dataset import get_data
 
 log = logging.getLogger(__name__)
 importer = ModelImporter(model_type='sklearn', latest=True)

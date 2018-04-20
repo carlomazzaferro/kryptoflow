@@ -16,7 +16,7 @@ def clean_text(text):
 
 class TextAnalyzer(object):
     """
-    A corpus reader for raw Mongo documents to enable preprocessing.
+    Assign sentiment to text
     """
     def __init__(self):
 

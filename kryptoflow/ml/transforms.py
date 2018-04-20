@@ -9,7 +9,7 @@ from tsfresh.utilities.dataframe_functions import impute
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from kryptoflow.analysis.utils import PickleBaseTransformer
+from kryptoflow.ml.utils import PickleBaseTransformer
 
 
 def unzip(X, y):

@@ -6,7 +6,7 @@ from keras.optimizers import Adam
 
 from time import time
 
-from kryptoflow.analysis.export import ModelExporter
+from kryptoflow.ml.export import ModelExporter
 
 time_steps = 8
 tensorboard = TensorBoard(log_dir="logs/{}".format(time()))

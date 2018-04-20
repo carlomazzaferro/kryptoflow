@@ -1,9 +1,9 @@
 import tweepy
-from kryptoflow.services.utilities.utils import load_conf
-from kryptoflow.models.streamer_base import AvroAsync
+from kryptoflow.scrapers.utilities.utils import load_conf
+from kryptoflow.common.streamer_base import AvroAsync
 import json
 from datetime import datetime
-from kryptoflow.services.transforms.sent_analysis import TextAnalyzer, clean_text
+from kryptoflow.scrapers.transforms.sent_analysis import TextAnalyzer, clean_text
 
 
 def flags(tweet):

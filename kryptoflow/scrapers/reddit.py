@@ -1,7 +1,7 @@
 import praw
-from kryptoflow.services.utilities.utils import load_conf
-from kryptoflow.models.streamer_base import AvroAsync
-from kryptoflow.services.transforms.sent_analysis import TextAnalyzer, clean_text
+from kryptoflow.scrapers.utilities.utils import load_conf
+from kryptoflow.common.streamer_base import AvroAsync
+from kryptoflow.scrapers.transforms.sent_analysis import TextAnalyzer, clean_text
 from datetime import datetime
 from time import time
 
