@@ -14,7 +14,7 @@ Run
 ===
 ### Infrastructure: kafka, tensorflow, et. al.
 
-Spin up kafka and related services (zookeeper, kafka-ui, etc.)
+Spin up kafka and related scrapers (zookeeper, kafka-ui, etc.)
 
 ```bash
 docker-compose up
@@ -30,9 +30,9 @@ docker exec -it kryptoflow bash
 Now you are inside the container, which contains all the code from the repo. Running:
 
 ```
-python3.6 kryptoflow/services/reddit.py
-python3.6 kryptoflow/services/twitter.py
-python3.6 kryptoflow/services/btcusd.py
+python3.6 kryptoflow/scrapers/reddit.py
+python3.6 kryptoflow/scrapers/twitter.py
+python3.6 kryptoflow/scrapers/btcusd.py
 ```
 
 Starts each service. Alternatively, run `supervisord -c resources/supervisord.conf`, and check the status
@@ -69,7 +69,7 @@ bash kryptoflow/serving/serve.sh 1
 ```
  
 The `1` indicates the number of the model. Check `saved_models/` directory for the available
-stored models. These are automatically saved when the class `kryptoflow.analysis.export.ModelExporter` is
+stored models. These are automatically saved when the class `kryptoflow.ml.export.ModelExporter` is
 instantiated. See the notebook for more info on how to stored the models themselves.
 
 
