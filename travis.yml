@@ -1,5 +1,0 @@
-language: python
-sudo: false
-git:
-  submodules: false
-  depth: 3
