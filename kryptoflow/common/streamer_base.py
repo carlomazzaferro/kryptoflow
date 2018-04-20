@@ -53,10 +53,11 @@ class AvroAsync(object):
                 running = False
         self.avro_consumer.close()
 
-    def read_from_start(self, persist=False, path='/'):
+    def read_from_start(self, persist=False, return_msgs=True, path='/'):
         c = AvroConsumer(dict(self.base_config, **{'group.id': 'groupid',
-                                                   'default.topic.config': #{'auto.offset.reset': 'beginning',
-                                                       {'auto.commit.enable': 'false'}
+                                                   'default.topic.config':
+                                                       {'auto.offset.reset': 'beginning',
+                                                        'auto.commit.enable': 'false'}
                                                    }
                               )
                          )
@@ -67,7 +68,7 @@ class AvroAsync(object):
             with open(os.path.join(path, self.topic + '.txt'), 'w') as out:
                 self.run_loop(c, file_object=out)
         else:
-            self.run_loop(c)
+            return self.run_loop(c, return_message=return_msgs)
 
     def read_from_offset(self, offset=1000):
         c = AvroConsumer(dict(self.base_config, **{'group.id': 'groupid-1',
@@ -89,17 +90,14 @@ class AvroAsync(object):
             msg = consumer.poll(timeout=3)
             if file_object or return_message:
                 try:
-                    encoded = json.dumps(msg.value())
-                    print(encoded)
-                    if encoded not in msg_stack[-10:]:
-                        msg_stack.append(msg.value())
+                    msg_stack.append(msg.value())
                 except TypeError:
                     print(msg.value())
 
                 if msg.timestamp()[1]/1000 > last_import:
                     break
             else:
-                print(msg.value())
+                print(msg)
 
         if file_object:
             for item in msg_stack:

@@ -1,13 +1,6 @@
-import json
 import pandas
 import numpy
-import os
-from kryptoflow import definitions
 from itertools import chain
-from kryptoflow.common.streamer_base import AvroAsync
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
@@ -79,38 +72,6 @@ class TimeEmbedder(BaseEstimator, TransformerMixin):
         return numpy.reshape(X, (X.shape[0], self.middle_shape, self.initial_dims)), y
 
 
-def accumulate_data(time_steps=definitions.TIMEFRAME):
-    consumer = AvroAsync(topic='gdax')
-    messages = consumer.read_new(accumulate=True, n_messages=time_steps, unique=True)
-    return messages
-
-
-def get_data(source, remote=False, keep_keys=list(['ts']),
-             categorical=list(['side'])):
-    file_path = '/media/carlo/HDD/kafka_local/'
-    file_path = os.path.join(file_path, source + '.txt')
-    if remote:
-        consumer = AvroAsync(topic='gdax')
-        data = consumer.read_new(accumulate=True, n_messages=definitions.TIMEFRAME, unique=True)
-        rows = [{k: v for k, v in msg.items() if k in keep_keys} for msg in data]
-
-    else:
-        rows = []
-        with open(file_path) as inf:
-            for i, row in enumerate(inf):
-                row_dict = json.loads(row)
-                rows.append({k: v for k, v in row_dict.items() if k in keep_keys})
-    df = pandas.DataFrame(rows)
-
-    df.index = pandas.to_datetime(df['ts'])
-    df['ts'] = pandas.to_datetime(df['ts'])
-    df['time_diff'] = df['ts'].diff().dt.seconds.div(1, fill_value=0)
-    if categorical:
-        df = one_hot_encode(df, categorical)
-    df = df.drop('ts', 1)
-    return df
-
-
 def one_hot_encode(df, categ_vars):
     ohe = []
     for categ in categ_vars:
@@ -118,20 +79,4 @@ def one_hot_encode(df, categ_vars):
         df = df.drop(categ, 1)
     return pandas.concat([df] + ohe, 1)
 
-
-if __name__ == '__main__':
-
-    local_df = get_data('gdax', remote=False, keep_keys=['ts', 'price', 'volume_24h',
-                                                         'spread', 'side'])  # type: pandas.DataFrame
-
-    remote_df = get_data('gdax', remote=True, keep_keys=['ts', 'price', 'volume_24h',
-                                                         'spread', 'side'])  # type: pandas.DataFrame
-
-    pipe = Pipeline([
-        ('tr', ForecastTransformer()),
-        ('scaler', MinMaxScaler()),
-        ('time', TimeEmbedder(inital_dims=len(local_df.columns)))
-    ])
-
-    x, y = pipe.fit_transform(local_df)
 
