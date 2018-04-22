@@ -21,6 +21,8 @@ docker-compose up
 ```
 
 ### Services: Data Gathering 
+*NOTE*: WIP, some stuff may may give errors or be less than optimally documented. 
+
 Build the application code that will gather data and stream it to kafka
 ```
 docker build -t kryptoflow .
