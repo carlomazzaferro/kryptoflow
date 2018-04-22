@@ -1,6 +1,5 @@
 sudo: required
 dist: trusty
-group: deprecated-2017Q4
 
 matrix:
   include:
@@ -27,8 +26,8 @@ matrix:
       - pip3 install -r backend/requirements/test.txt --cache-dir $HOME/backend/.pip-cache
 
     script:
-      - python backend/app/main.py >> log.txt 2>&1  &
-      - python backend/app/main.py > /dev/null &
+      - python kryptoflow/serving/app.py >> log.txt 2>&1  &
+      - python kryptoflow/serving/app.py  > /dev/null &
       - py.test --cov ../  ./backend/app/tests/test_api.py
 
     after_success:
@@ -44,7 +43,7 @@ matrix:
 
     cache:
       directories:
-        - $HOME/frontend/.npm
+        - $HOME/kryptoflow/serving/frontend/.npm
 
     env:
       global:
@@ -61,7 +60,3 @@ matrix:
     script:
       - npm run lint:js
       - npm test
-
-    after_success:
-      - bash ./scripts/pr_deploy.sh
-- bash ./scripts/gh_deploy.sh
