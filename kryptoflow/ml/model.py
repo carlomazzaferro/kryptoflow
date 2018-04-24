@@ -6,7 +6,6 @@ from keras.optimizers import Adam
 
 from time import time
 
-from kryptoflow.ml.export import ModelExporter
 
 time_steps = 8
 tensorboard = TensorBoard(log_dir="logs/{}".format(time()))
@@ -28,6 +27,7 @@ class KerasModel(object):
         return model
 
     def fit(self, X, y, x_val, y_val, epochs=15):
+
         self.model.fit(X, y, epochs=epochs,
                        batch_size=64, verbose=2, validation_data=(x_val, y_val),
                        callbacks=[tensorboard])
