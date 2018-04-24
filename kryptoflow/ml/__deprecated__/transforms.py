@@ -9,7 +9,6 @@ from tsfresh.utilities.dataframe_functions import impute
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from kryptoflow.ml.utils import PickleBaseTransformer
 
 
 def unzip(X, y):
@@ -124,34 +123,3 @@ class PCAForPandas(PCA):
         X.sort_index(axis=1, inplace=True)
         self._X_columns = list(X.columns)
         return X
-
-
-if __name__ == '__main__':
-
-    df = pandas.read_csv('resources/all.csv', names=['price', 'volume', 'time', 'sentence_ct', 'polarity']).set_index('time')
-    df.index = pandas.to_datetime(df.index)
-
-    """
-    pipe = Pipeline(
-        [
-            ('compress', FrameCompressor(minutes=1)),
-            ('roll', FrameRoller(minutes=20)),
-            ('extract_features', RelevantFeatureAugmenter(column_id='id', column_sort='time')),
-            ('pca', PCAForPandas(n_components=10))
-        ]
-    )
-
-    d, y = pipe.fit_transform(df)
-
-    assert len(d) == len(y)
-    print(d.head())
-    print(y)
-    """
-    f = FrameCompressor(minutes=1)
-    # print(type(f.__class__.__name__))
-    pmod = f.fit_transform(df[0:2000])
-    f.store()
-
-    loaded = f.load()
-    assert loaded.tss == f.tss
-    print(loaded.transform(df[2000:3000]))
