@@ -15,9 +15,9 @@ Implemented so far:
 3. Tensorflow training and model persistance
 4. Tensorflow Serving APIs exposed through a Flask endpoint. A few details are worth mentioning here. The Tensorflow Serving is actually run within a docker container, and that docker container is polled by a Flask endpoint through gRPC.
 
-Run
-===
-### Infrastructure: kafka, tensorflow, et. al.
+Installation and Infrastructure
+===============================
+## Infrastructure: kafka, tensorflow, et. al.
 
 Spin up kafka and related scrapers (zookeeper, kafka-ui, etc.)
 
@@ -25,13 +25,13 @@ Spin up kafka and related scrapers (zookeeper, kafka-ui, etc.)
 docker-compose up
 ```
 
-### Services, without Docker (MacOS, Ubuntu)
+## Data collection, without Docker (MacOS, Ubuntu)
 
 First, create a new virtual environment. This is highly recommended for managing dependencies.
 
 Then, modify the `resources/resources.json` file, and add your twitter and reddit API keys. This will enable you to programmatically access the twitter and Reddit APIs.
 
-## Dependencies
+### Dependencies
 
 1. python3.6 (recommend installing with homebrew)
 2. librdkafka: `brew install librdkafka`
@@ -48,6 +48,7 @@ and adding the following line to it:
 
 `127.0.0.1       localhost kafka1`
 
+### Run scrapers
 
 Then, run `mkdir -p /tmp/logs/ && supervisord -c resources/supervisord.conf`
 
@@ -64,11 +65,11 @@ Alternatively, run:
 To verify that your data is being ingested appropriatley, head to [http://localhost:8000](http://localhost:8000) for a visual ui of the Kafka
 topics being ingested.
 
-###  Analysis
+##  Analysis
 Check out Keras [training notebook](https://github.com/carlomazzaferro/kryptoflow/blob/master/keras_training.ipynb)
 for training and model storing instructions
 
-### Deploy with Tensorflow Serving
+## Deploy with Tensorflow Serving
 
 Build the docker container with bazel, tf serving, and all the required dependencies to
 serve the model. This may take some time (~40 minutes)
