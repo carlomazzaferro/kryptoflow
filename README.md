@@ -55,9 +55,11 @@ This will run the three scripts below and will take care of restarting them if/w
 
 Alternatively, run:
 
-python3.6 kryptoflow/scrapers/reddit.py
-python3.6 kryptoflow/scrapers/gdax_ws.py
-python3.6 kryptoflow/scrapers/twitter.py
+`python3.6 kryptoflow/scrapers/reddit.py`
+
+`python3.6 kryptoflow/scrapers/gdax_ws.py`
+
+`python3.6 kryptoflow/scrapers/twitter.py`
 
 To verify that your data is being ingested appropriatley, head to [http://localhost:8000](http://localhost:8000) for a visual ui of the Kafka
 topics being ingested.
