@@ -29,6 +29,8 @@ docker-compose up
 
 First, create a new virtual environment. This is highly recommended for managing dependencies.
 
+Then, modify the `resources/resources.json` file, and add your twitter and reddit API keys. This will enable you to programmatically access the twitter and Reddit APIs.
+
 ## Dependencies
 
 1. python3.6 (recommend installing with homebrew)
@@ -38,7 +40,18 @@ First, create a new virtual environment. This is highly recommended for managing
 4. Local install: `pip install -e .`
 5. Kafka IP: `export KAFKA_SERVER_IP='kafka1'`
 
+Finally, you may need to edit your `/etc/hosts/` to be able to connect to kafka. Do so by running:
+
+`sudo nano /etc/hosts`
+
+and adding the following line to it:
+
+`127.0.0.1       localhost kafka1`
+
+
 Then, run `mkdir -p /tmp/logs/ && supervisord -c resources/supervisord.conf`
+
+This will run the three scripts below and will take care of restarting them if/when they fail. This should happen eventually due to API downtimes, malformatted data that is not handled, etc. Usually however the scripts are pretty resiliant and have run for weeks straight.
 
 Alternatively, run:
 
