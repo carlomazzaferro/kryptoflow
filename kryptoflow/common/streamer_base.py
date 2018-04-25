@@ -1,4 +1,5 @@
 from kryptoflow.definitions import SCHEMAS
+import logging
 import os
 import json
 from confluent_kafka import avro, TopicPartition
@@ -6,6 +7,9 @@ from confluent_kafka.avro import AvroProducer, AvroConsumer
 from confluent_kafka import KafkaError
 import confluent_kafka
 import time
+
+
+_logger = logging.getLogger('root')
 
 
 class AvroAsync(object):
@@ -54,6 +58,7 @@ class AvroAsync(object):
         self.avro_consumer.close()
 
     def read_from_start(self, persist=False, return_msgs=True, path='/'):
+        _logger.debug('Reading data from Kafka from start...')
         c = AvroConsumer(dict(self.base_config, **{'group.id': 'groupid',
                                                    'default.topic.config':
                                                        {'auto.offset.reset': 'beginning',
@@ -83,10 +88,14 @@ class AvroAsync(object):
 
     @staticmethod
     def run_loop(consumer, file_object=None, return_message=False):
+        _logger.debug('Kakfa consumer initialized, looping through data...')
         counter = 0
         msg_stack = []
         last_import = time.time() - 60
         while True:
+            if counter % 10000:
+                _logger.debug('Read {} messages from Kafka'.format(counter))
+            counter += 1
             msg = consumer.poll(timeout=3)
             if file_object or return_message:
                 try:
@@ -107,10 +116,3 @@ class AvroAsync(object):
             return msg_stack
 
         print(counter)
-
-
-if __name__ == '__main__':
-
-    a = AvroAsync(topic='gdax')
-    msgs = a.read_from_offset(offset=700000)
-    print(len(msgs))
