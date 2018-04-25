@@ -1,5 +1,6 @@
 import logging
 from kryptoflow.serving.backend import utils, settings
+from kryptoflow.definitions import TIMEFRAME
 import tensorflow as tf
 import numpy
 
@@ -7,8 +8,7 @@ import numpy
 from grpc.beta import implementations
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
-from kryptoflow.ml.export import ModelImporter
-from kryptoflow.ml.dataset import get_data
+from common.data_interface import accumulate_data, ModelImporter
 
 log = logging.getLogger(__name__)
 importer = ModelImporter(model_type='sklearn', latest=True)
@@ -57,8 +57,7 @@ def _make_prediction_and_prepare_results(stub, request):
 
 
 def _load_and_transform_data():
-    remote_df = get_data('gdax', remote=True, keep_keys=['ts', 'price', 'volume_24h',
-                                                         'spread', 'side'])
+    remote_df = accumulate_data(time_steps=TIMEFRAME)
 
     x, y = transformer_pipeline.transform(remote_df)
     return x
