@@ -27,7 +27,17 @@ def parse_common_args():
 
 
 def parse_start_args(args):
+    parent_parser = parse_common_args()
+    parser = argparse.ArgumentParser(
+        description='Train model using Kryptoflow',
+        parents=[parent_parser])
 
+    parser.add_argument(
+        '--scrape',
+        help='Start automatically scraping gdax, reddit, twitter',
+        action='store_true')
+
+    return parser.parse_args(args)
 
 
 def parse_train_args(args):

@@ -7,7 +7,7 @@ from . import dataset
 from . import data_interface
 from . import model
 from . import app
-from .utils import parse_common_args, setup_logging
+from .utils import parse_start_args, setup_logging
 
 
 def main(args):
@@ -16,8 +16,10 @@ def main(args):
     Args:
       args ([str]): command line parameter list
     """
+    args = parse_start_args(args)
     setup_logging(args.loglevel)
-    # subprocess.run(['supervisord', '-c', os.path.join(definitions.RESOURCES_PATH, 'supervisord.conf')])
+    if args.scrape:
+        subprocess.run(['supervisord', '-c', os.path.join(definitions.RESOURCES_PATH, 'supervisord.conf')])
     app.main()
 
 
