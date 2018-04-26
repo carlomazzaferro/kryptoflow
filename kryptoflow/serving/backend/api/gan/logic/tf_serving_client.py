@@ -8,7 +8,7 @@ import numpy
 from grpc.beta import implementations
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
-from common.data_interface import accumulate_data, ModelImporter
+from kryptoflow.common.data_interface import accumulate_data, ModelImporter
 
 log = logging.getLogger(__name__)
 importer = ModelImporter(model_type='sklearn', latest=True)
