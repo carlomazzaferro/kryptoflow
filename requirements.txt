@@ -12,5 +12,4 @@ tensorflow
 scikit-learn
 flask
 flask-cors
-tensorflow
 sortedcontainers
