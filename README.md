@@ -65,6 +65,35 @@ Alternatively, run:
 To verify that your data is being ingested appropriatley, head to [http://localhost:8000](http://localhost:8000) for a visual ui of the Kafka
 topics being ingested.
 
+## Webapp
+
+The scope of the project is creating a _framework_. As such, I found it tremendously useful (and a great learning
+experience) to add a visualization layer that would make it easy to visualize the collected data, as well as 
+the performance of the models. A bare-bones (note: still in development) ember.js can be accessed by running:
+
+`python -m kryptoflow.serving.app.py -vv`
+
+Then, head to  [http://localhost:5000](http://0.0.0.0:5000) and click on 'Charts'. To retrieve historical
+data, click on 'From Server'.
+
+This should show up: 
+
+![](resources/frontend.png)
+
+
+## API
+
+The backend was written in Flask. It provides restful access to historical data as well as access to the prediction
+service. The latter should work only if the steps outlined in the Analysis section have been followed. The api was 
+built with [Flask-RESTPLUS](http://flask-restplus.readthedocs.io/en/stable/), which offers automated documentation
+with swagger. 
+
+Head to [http://0.0.0.0:5000/tf_api/#!/historical_data](http://0.0.0.0:5000/tf_api/#!/historical_data) to check it out. 
+
+Preview:
+
+![](resources/api.png)
+
 ##  Analysis
 Check out Keras [training notebook](https://github.com/carlomazzaferro/kryptoflow/blob/master/keras_training.ipynb)
 for training and model storing instructions
