@@ -118,4 +118,8 @@ stored models. These are automatically saved when the class `kryptoflow.ml.expor
 instantiated. See the notebook for more info on how to stored the models themselves.
 
 
+## License
+
+[GNU General Public License v3.0](https://choosealicense.com/licenses/gpl-3.0/)
+
 
