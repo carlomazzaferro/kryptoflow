@@ -15,13 +15,14 @@ RESTPLUS_ERROR_404_HELP = False
 # GAN client settings
 DEFAULT_TF_SERVER_NAME = '172.17.0.2'
 DEFAULT_TF_SERVER_PORT = 9000
-TF_MODEL_NAME = 'base'
+TF_MODEL_NAME = 'default'
 TF_MODEL_SIGNATURE_NAME = 'predict'
 TF_MODEL_INPUTS_KEY = 'states'
 
 # Model Settings
 TIMES_STEPS = TIMEFRAME
 DIST_FILES_DIR = os.path.join(APP_DIR, 'dist')
-STATIC_FILES_DIR = os.path.join(APP_DIR, 'dist/static')
+EMEBER_DIST = os.path.join(APP_DIR, 'frontend/dist')
+STATIC_FILES_DIR = os.path.join(APP_DIR, 'frontend/dist/assets')
 
 
