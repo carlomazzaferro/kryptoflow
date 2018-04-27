@@ -14,9 +14,9 @@ _logger = logging.getLogger('root')
 
 class AvroAsync(object):
 
-    def __init__(self, topic=None):
+    def __init__(self, topic=None, ip='localhost'):
         self.topic = topic
-        self.ip = os.environ['KAFKA_SERVER_IP']
+        self.ip = ip  # os.environ['KAFKA_SERVER_IP']
         self.base_config = {'bootstrap.servers': self.ip + ':9092',
                             'schema.registry.url': 'http://' + self.ip + ':8081'}
 
@@ -27,8 +27,8 @@ class AvroAsync(object):
         self.value_schema = avro.load(os.path.join(SCHEMAS, self.topic + '.avsc'))
 
     def producer(self):
-        return AvroProducer({'bootstrap.servers': 'localhost:9092',
-                             'schema.registry.url': 'http://localhost:8081'},
+        return AvroProducer({'bootstrap.servers': self.ip + ':9092',
+                             'schema.registry.url': 'http://' + self.ip + ':8081'},
                             default_key_schema=self.key_schema,
                             default_value_schema=self.value_schema)
 
