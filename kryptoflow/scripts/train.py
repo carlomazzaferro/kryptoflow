@@ -38,7 +38,7 @@ def train(split=0.8, epochs=10):
     x_val, y_val = x[split_length:], y[split_length:]
     keras_model = model.KerasModel(dims=x.shape[1:])
     keras_model.fit(x, y, x_val, y_val, epochs=epochs)
-    exp.store(keras_model.model, 'lstm', model_type='keras')
+    exp.store(keras_model.model, 'base', model_type='keras')
 
 
 def main(args):
