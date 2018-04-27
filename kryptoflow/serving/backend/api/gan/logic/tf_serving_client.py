@@ -16,8 +16,8 @@ transformer_pipeline = importer.load('pipeline')
 
 
 def _inv_transf(x):
-    x -= transformer_pipeline.named_steps['sc'].min_[-1]
-    x /= transformer_pipeline.named_steps['sc'].scale_[-1]
+    x -= transformer_pipeline.named_steps['scaler'].min_[-1]
+    x /= transformer_pipeline.named_steps['scaler'].scale_[-1]
     return x
 
 
@@ -57,8 +57,7 @@ def _make_prediction_and_prepare_results(stub, request):
 
 
 def _load_and_transform_data():
-    remote_df = accumulate_data(time_steps=TIMEFRAME)
-
+    remote_df = accumulate_data(time_steps=settings.TIMEFRAME)
     x, y = transformer_pipeline.transform(remote_df)
     return x
 

@@ -3,7 +3,7 @@ Borrowed and adapted from the amazing: https://becominghuman.ai/creating-restful
 """
 
 import logging.config
-from flask import Flask, Blueprint, render_template
+from flask import Flask, Blueprint, render_template, send_from_directory
 from flask_cors import CORS
 from kryptoflow.serving.backend import utils, settings
 from kryptoflow.serving.backend.api.restplus import api
@@ -16,7 +16,7 @@ from kryptoflow.serving.backend.ws.handler import thread, AvroListener
 # create Flask application
 app = Flask(__name__,
             static_folder=settings.STATIC_FILES_DIR,
-            template_folder=settings.DIST_FILES_DIR)
+            template_folder=settings.EMEBER_DIST)
 
 socketio = SocketIO(app)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 
 @app.route('/')
 def index():
-    return render_template("index.html")
+    return send_from_directory(settings.EMEBER_DIST, "index.html")
 
 
 @app.route('/', defaults={'path': ''})
@@ -98,7 +98,7 @@ def main():
     log.info(
         '>>>>> Starting TF Serving client at http://{}/ >>>>>'.format(app.config['SERVER_NAME'])
         )
-    # app.run(debug=flask_debug, host=server_name, port=5000)
+    app.run(debug=flask_debug, host=server_name, port=5000)
     socketio.run(app, debug=flask_debug, host=server_name, port=5000)
 
 
