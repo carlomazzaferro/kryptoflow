@@ -17,12 +17,7 @@ from kryptoflow.ml.dataset import one_hot_encode
 _logger = logging.getLogger('root')
 
 
-def get_data(topic, keep_keys=list(['ts']), categorical=list(['side'])):
-
-    consumer = AvroAsync(topic=topic)
-    data = consumer.read_from_start(return_msgs=True)
-    rows = [{k: v for k, v in msg.items() if k in keep_keys} for msg in data]
-
+def rows_to_df(rows, categorical=list([])):
     df = pandas.DataFrame(rows)
     df.index = pandas.to_datetime(df['ts'])
     df['ts'] = pandas.to_datetime(df['ts'])
@@ -33,10 +28,19 @@ def get_data(topic, keep_keys=list(['ts']), categorical=list(['side'])):
     return df
 
 
+def get_data(topic, keep_keys=list(['ts']), categorical=list(['side'])):
+
+    consumer = AvroAsync(topic=topic)
+    data = consumer.read_from_start(return_msgs=True)
+    rows = [{k: v for k, v in msg.items() if k in keep_keys} for msg in data]
+    return rows_to_df(rows, categorical=categorical)
+
+
 def accumulate_data(time_steps=definitions.TIMEFRAME):
     consumer = AvroAsync(topic='gdax')
     messages = consumer.read_new(accumulate=True, n_messages=time_steps, unique=True)
-    return messages
+    rows = [{k: v for k, v in msg.items() if k in ['ts', 'price', 'volume_24h', 'spread', 'side']} for msg in messages]
+    return rows_to_df(rows, categorical=list(['side']))
 
 
 class ModelImporter(object):
