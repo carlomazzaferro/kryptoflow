@@ -11,15 +11,17 @@ from kryptoflow.serving.backend.api.gan.endpoints.client import ns as prediction
 from kryptoflow.serving.backend.api.historical.endpoints.client import ns as historic_namespace
 from kryptoflow.serving.backend.api.test import ns as test_namespace
 from flask_socketio import SocketIO
-from kryptoflow.serving.backend.ws.handler import thread, AvroListener
+from kryptoflow.serving.backend.ws.handler import AvroListener
 
 # create Flask application
 app = Flask(__name__,
             static_folder=settings.STATIC_FILES_DIR,
             template_folder=settings.EMEBER_DIST)
 
-socketio = SocketIO(app)
+
 CORS(app, resources={r"/*": {"origins": "*"}})
+socketio = SocketIO(app)
+
 
 # load logging confoguration and create log object
 logging.config.fileConfig('kryptoflow/serving/backend/logging.conf')
@@ -34,11 +36,12 @@ def index():
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
-    return render_template("index.html")
+    return send_from_directory(settings.EMEBER_DIST, "index.html")
 
 
 @socketio.on('connect')
 def test_connection():
+    print('TESTING CONNN')
     global thread
     # Start the random number generator thread only if the thread has not been started before.
     if not thread.is_alive():
@@ -98,7 +101,7 @@ def main():
     log.info(
         '>>>>> Starting TF Serving client at http://{}/ >>>>>'.format(app.config['SERVER_NAME'])
         )
-    app.run(debug=flask_debug, host=server_name, port=5000)
+    # app.run(debug=flask_debug, host=server_name, port=5000)
     socketio.run(app, debug=flask_debug, host=server_name, port=5000)
 
 
