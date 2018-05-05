@@ -1,7 +1,7 @@
 import json
 from flask_restplus import Resource
 from kryptoflow.serving.backend.api.restplus import api
-from kryptoflow.serving.backend.api.gan.logic.tf_serving_client import make_prediction, _load_and_transform_data
+from kryptoflow.serving.backend.api.predict.logic.tf_serving_client import make_prediction, _load_and_transform_data
 
 
 # create dedicated namespace for GAN client
@@ -18,15 +18,15 @@ class Prediction(Resource):
                 500: "Internal server error"
                 })
     def post(self):
-        # try:
-        payload = _load_and_transform_data()
-        print(payload)
-        # except Exception as inst:
-        #     return {'message': 'something wrong with incoming request. ' +
-        #                        'Original message: {}'.format(inst)}, 400
-        # try:
-        results = make_prediction(payload)
-        return json.loads(results['val']), 200
+        try:
+            payload = _load_and_transform_data()
+            print(payload)
+        except Exception as inst:
+            return {'message': 'something wrong with incoming request. ' +
+                               'Original message: {}'.format(inst)}, 400
+        try:
+            results = make_prediction(payload)
+            return json.loads(results['val']), 200
 
-        # except Exception as inst:
-        #     return {'message': 'internal error: {}'.format(inst)}, 500
+        except Exception as inst:
+            return {'message': 'internal error: {}'.format(inst)}, 500
