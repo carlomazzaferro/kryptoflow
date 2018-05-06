@@ -54,7 +54,7 @@ and adding the following line to it:
 
 ### Run scrapers
 
-Then, run `mkdir -p /tmp/logs/ && supervisord -c resources/supervisord.conf`
+Then, run `mkdir -p ~/tmp/logs/ && supervisord -c resources/supervisord.conf`
 
 This will run the three scripts below and will take care of restarting them if/when they fail. This should happen eventually due to API downtimes, malformatted data that is not handled, etc. Usually however the scripts are pretty resiliant and have run for weeks straight.
 
