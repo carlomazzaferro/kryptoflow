@@ -1,6 +1,8 @@
 template:
     url: https://github.com/ovac/ovac-couscous-template
 
+baseUrl: http://carlomazzaferro.github.io/kryptoflow
+
 include:
     - .
     - docs
