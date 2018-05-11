@@ -4,8 +4,8 @@ template:
 baseUrl: http://carlomazzaferro.github.io/kryptoflow
 
 include:
-    - .
     - docs
+
 github:
     user: carlomazzaferro
     repo: kryptoflow
