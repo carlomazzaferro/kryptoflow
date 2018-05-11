@@ -1,0 +1,107 @@
+code {
+  max-width: 100%;
+  overflow-x: scroll;
+}
+.panel {
+  background-color: #222930;
+  color: #ffffff;
+  position: fixed;
+  left: -15.625em;
+  /*left or right and the width of your navigation panel*/
+  width: 15.625em;
+  /*should match the above value*/
+  z-index: 2;
+  overflow-y: scroll;
+  padding: 1rem;
+  height: 100%;
+}
+.panel li {
+  list-style: none;
+}
+.panel a {
+  color: #ffffff;
+}
+.panel a:hover {
+  color: #4EB1BA;
+}
+.push {
+  overflow: hidden;
+  position: relative;
+  margin-top: 10rem;
+}
+.push header {
+  text-align: center;
+  position: fixed;
+  top: 0;
+  background: #f4f5f6;
+  border-bottom: .1rem solid #d1d1d1;
+  width: 100%;
+  z-index: 2;
+  height: 6rem;
+  transition: top 0.2s ease-in-out;
+}
+.push header h1 {
+  margin-bottom: 0;
+}
+.push header .menu-link {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+.push header .github {
+  border: 0;
+  color: #f4f5f6;
+  fill: #9b4dca;
+  height: 6rem;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 6rem;
+  z-index: 1;
+}
+.anchor {
+  padding-top: 6rem;
+  margin-top: -6rem;
+}
+.current {
+  border-bottom: 0.1rem solid #f4f5f6;
+}
+
+.text-muted {
+  font-weight: bolder;
+  color: #aaaaaa;
+}
+.current a {
+  color: #dea9ff;
+  font-weight: bold;
+}
+.content: { 
+    overflow: scroll; 
+    position: absolute;
+    top: 100px;
+    bottom: 0px;
+    width: 100%;
+    border: 1px solid blue; 
+}
+/* Larger than mobile screen */
+/* Larger than tablet screen */
+@media (min-width: 80rem) {
+  .panel {
+    left: 0 !important;
+    display: inline-block !important;
+  }
+  .push {
+    position: relative !important;
+    display: inline-block !important;
+    width: calc(100% - 15.625em);
+    margin-left: 15.625em;
+  }
+  .push header {
+    width: calc(100% - 15.625em);
+    right: 0;
+  }
+  .push header .menu-link {
+    display: none;
+  }
+}
+/* Larger than desktop screen */

@@ -1,0 +1,170 @@
+<!doctype html>
+
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+
+  <title>Kryptoflow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="carlomazzaferro">
+
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/milligram.min.css">
+  <link rel="stylesheet" href="/css/ovac-couscous.css">
+  <link rel="stylesheet" href="/css/emojifyBase.min.css">
+  <link rel="stylesheet" href="/css/emojify.min.css">
+  <link rel="stylesheet" href="/css/emojify-emoticons.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TWFSSDL"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <nav id="menu" class="panel" role="navigation">
+        <h5>Table of Contents</h5>
+                <ul>
+                            <p class="text-muted">
+                    Introduction
+                </p>
+
+                <ul class="nav nav-pills nav-stacked">
+                                            <li class="">
+                            <a href="/index.html">
+                                Home
+                            </a>
+                        </li>
+                                            <li class="">
+                            <a href="/architecture.html">
+                                Architecture
+                            </a>
+                        </li>
+                                    </ul>
+                            <p class="text-muted">
+                    Getting Started
+                </p>
+
+                <ul class="nav nav-pills nav-stacked">
+                                            <li class="">
+                            <a href="/installation.html">
+                                Installation
+                            </a>
+                        </li>
+                                    </ul>
+                            <p class="text-muted">
+                    Guide
+                </p>
+
+                <ul class="nav nav-pills nav-stacked">
+                                            <li class="">
+                            <a href="/config.html">
+                                Config
+                            </a>
+                        </li>
+                                    </ul>
+                            <p class="text-muted">
+                    Api
+                </p>
+
+                <ul class="nav nav-pills nav-stacked">
+                                            <li class="">
+                            <a href="/api/index.html">
+                                Api
+                            </a>
+                        </li>
+                                            <li class="">
+                            <a href="/coverage/index.html">
+                                Coverage
+                            </a>
+                        </li>
+                                    </ul>
+                            <p class="text-muted">
+                    Links
+                </p>
+
+                <ul class="nav nav-pills nav-stacked">
+                                            <li class="">
+                            <a href="https://some-website">
+                                External Official Documentation
+                            </a>
+                        </li>
+                                            <li class="">
+                            <a href="https://kryptoflow.org">
+                                Api Swagger UI
+                            </a>
+                        </li>
+                                    </ul>
+            
+                    </ul>
+            </nav>
+    <div class="push">
+        <header>
+            <a href="#menu" class="menu-link">&#9776;</a>
+            <h1>Kryptoflow</h1>
+            <a class="github" href="http://github.com/carlomazzaferro/kryptoflow" title="Kryptoflow sur Github" target="blank">
+                <svg width="80" height="80" viewBox="0 0 250 250" class="github">
+                    <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+                    <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+                    <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+                </svg>
+            </a>
+        </header>
+        <div class="container">
+                            <p><a href="https://gitter.im/kryptoflow-repo/Lobby?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img src="https://badges.gitter.im/kryptoflow-repo/Lobby.svg" alt="Join the chat at https://gitter.im/kryptoflow-repo/Lobby" /></a>
+<a href="https://travis-ci.org/carlomazzaferro/kryptoflow"><img src="https://travis-ci.org/carlomazzaferro/kryptoflow.svg?branch=master" alt="Build Status" /></a></p>
+<p>An algorithmic crypto trading framework with Kafka and TensorFlow (<a href="https://keras.io/">Keras</a> + <a href="https://www.tensorflow.org/serving/">TensorFlow Serving</a>)</p>
+<h3 id="premise">Premise</h3>
+<p>The idea behind this project is to take care of the enormous boilerplating and infrastructural work
+that goes behind building a machine learning-driven trading systems. Being a very young project, it is
+still in experimental stages, and much work is left to be done. This is much closer to an early alpha
+than a working release, so proceed with caution!</p>
+<h3 id="current-state-amp-future-goals">Current State &amp; Future Goals</h3>
+<p>Implemented so far:</p>
+<ol>
+<li>Data ingestion pipeline, which includes websocket streams from twitter, reddit, gdax which are saved to three separate Kafka topics.</li>
+<li>Data transforms to model gdax (BTC-USD only for now) into time-series of custom timespan to which RNNs/LSTMs can be applied for time-series prediction</li>
+<li>Tensorflow training and model persistance</li>
+<li>Tensorflow Serving APIs exposed through a Flask endpoint. A few details are worth mentioning here. The Tensorflow Serving is actually run within a docker container, and that docker container is polled by a Flask endpoint through gRPC.</li>
+</ol>
+<p>Todo:</p>
+<ol>
+<li>Trading system </li>
+<li>Webapp functionality, namely:
+a. Twitter/Reddit sentiment (maybe add a Word Cloud?)
+b. Predictions (live and historical)
+c. Management console: kickstart retrai/deploy new model, post to GDAX
+d. Visualization of model performance
+e. Predicted gain/loss</li>
+<li>Continuous training and deployment of models</li>
+<li>Road map to deploying the system in a production environment</li>
+</ol>
+<h3 id="architecture">Architecture</h3>
+<p>To get a sense of how the project is set up, visit <a href="architecture.html">architecture</a></p>
+                    </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="/js/emojify.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script src="/js/bigSlide.js"></script>
+    <script src="/js/hide-on-scroll.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('.menu-link').bigSlide({
+            'easyClose': true
+        });
+    });
+    </script>
+
+            
+        
+        
+    
+</body>
+</html>
