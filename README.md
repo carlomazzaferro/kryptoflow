@@ -7,6 +7,7 @@ Kryptoflow
 
 Algorithmic crypto trading framework with Kafka and TensorFlow ([Keras](https://keras.io/) + [TensorFlow Serving](https://www.tensorflow.org/serving/))
 
+Documentation live at: https://carlomazzaferro.github.io/kryptoflow/index.html
 
 Description
 ===========
