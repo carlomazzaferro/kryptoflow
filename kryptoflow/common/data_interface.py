@@ -10,7 +10,7 @@ from tensorflow.python.saved_model.signature_def_utils_impl import predict_signa
 
 from kryptoflow.definitions import SAVED_MODELS
 from kryptoflow import definitions
-from kryptoflow.common.streamer_base import AvroAsync
+from kryptoflow.common.stream import KafkaStream
 from kryptoflow.ml.dataset import one_hot_encode
 
 
@@ -30,14 +30,14 @@ def rows_to_df(rows, categorical=list([])):
 
 def get_data(topic, keep_keys=list(['ts']), categorical=list(['side'])):
 
-    consumer = AvroAsync(topic=topic)
+    consumer = KafkaStream(topic=topic)
     data = consumer.read_from_start(return_msgs=True)
     rows = [{k: v for k, v in msg.items() if k in keep_keys} for msg in data]
     return rows_to_df(rows, categorical=categorical)
 
 
 def accumulate_data(time_steps=definitions.TIMEFRAME):
-    consumer = AvroAsync(topic='gdax')
+    consumer = KafkaStream(topic='gdax')
     messages = consumer.read_new(accumulate=True, n_messages=time_steps, unique=True)
     rows = [{k: v for k, v in msg.items() if k in ['ts', 'price', 'volume_24h', 'spread', 'side']} for msg in messages]
     return rows_to_df(rows, categorical=list(['side']))
