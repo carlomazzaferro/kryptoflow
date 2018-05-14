@@ -29,8 +29,8 @@ export default Component.extend({
 
   onMessage(data) {
     let date = new Date(data.ts);
-    let ct = copy(this.get('chartData'))
-    ct[0].data.push([date.getTime(), data.price])
+    let ct = copy(this.get('chartData'));
+    ct[0].data.push([date.getTime(), data.price]);
     this.set('chartData', ct);
   },
 

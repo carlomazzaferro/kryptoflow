@@ -8,7 +8,7 @@
  *            Portions Copyright 2008-2011 Apple Inc. All rights reserved.
  * @license   Licensed under MIT license
  *            See https://raw.github.com/emberjs/ember.js/master/LICENSE
- * @version   3.1.0
+ * @version   3.1.1
  */
 
 /*globals process */
@@ -2718,7 +2718,11 @@ Ember.setupForTesting = testing.setupForTesting;
 
     let pendingRequests;
     if (Ember.__loader.registry['ember-testing/test/pending_requests']) {
+      // Ember <= 3.1
       pendingRequests = Ember.__loader.require('ember-testing/test/pending_requests');
+    } else if (Ember.__loader.registry['ember-testing/lib/test/pending_requests']) {
+      // Ember >= 3.2
+      pendingRequests = Ember.__loader.require('ember-testing/lib/test/pending_requests');
     }
 
     if (pendingRequests) {
@@ -8476,6 +8480,10 @@ define('@ember/test-helpers/dom/find-all', ['exports', '@ember/test-helpers/dom/
       throw new Error('Must pass a selector to `findAll`.');
     }
 
+    if (arguments.length > 1) {
+      throw new Error('The `findAll` test helper only takes a single argument.');
+    }
+
     return (0, _toArray.default)((0, _getElements.default)(selector));
   }
 });
@@ -8499,6 +8507,10 @@ define('@ember/test-helpers/dom/find', ['exports', '@ember/test-helpers/dom/-get
   function find(selector) {
     if (!selector) {
       throw new Error('Must pass a selector to `find`.');
+    }
+
+    if (arguments.length > 1) {
+      throw new Error('The `find` test helper only takes a single argument.');
     }
 
     return (0, _getElement.default)(selector);
@@ -8615,13 +8627,13 @@ define('@ember/test-helpers/dom/fire-event', ['exports'], function (exports) {
       // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent
       Object.defineProperty(event, 'keyCode', {
         get() {
-          return parseInt(this.key);
+          return parseInt(eventOpts.keyCode);
         }
       });
 
       Object.defineProperty(event, 'which', {
         get() {
-          return parseInt(this.key);
+          return parseInt(eventOpts.which);
         }
       });
 
@@ -8906,13 +8918,99 @@ define('@ember/test-helpers/dom/trigger-key-event', ['exports', '@ember/test-hel
     metaKey: false
   });
 
+  // This is not a comprehensive list, but it is better than nothing.
+  const keyFromKeyCode = {
+    8: 'Backspace',
+    9: 'Tab',
+    13: 'Enter',
+    16: 'Shift',
+    17: 'Control',
+    18: 'Alt',
+    20: 'CapsLock',
+    27: 'Escape',
+    32: '',
+    37: 'ArrowLeft',
+    38: 'ArrowUp',
+    39: 'ArrowRight',
+    40: 'ArrowDown',
+    65: 'a',
+    66: 'b',
+    67: 'c',
+    68: 'd',
+    69: 'e',
+    70: 'f',
+    71: 'g',
+    72: 'h',
+    73: 'i',
+    74: 'j',
+    75: 'k',
+    76: 'l',
+    77: 'm',
+    78: 'n',
+    79: 'o',
+    80: 'p',
+    81: 'q',
+    82: 'r',
+    83: 's',
+    84: 't',
+    85: 'u',
+    86: 'v',
+    87: 'v',
+    88: 'x',
+    89: 'y',
+    90: 'z',
+    91: 'Meta',
+    93: 'Meta', // There is two keys that map to meta,
+    187: '=',
+    189: '-'
+  };
+
   /**
-    Triggers a keyboard event on the specified target.
+    Calculates the value of KeyboardEvent#key given a keycode and the modifiers.
+    Note that this works if the key is pressed in combination with the shift key, but it cannot
+    detect if caps lock is enabled.
+    @param {number} keycode The keycode of the event.
+    @param {object} modifiers The modifiers of the event.
+    @returns {string} The key string for the event.
+   */
+  function keyFromKeyCodeAndModifiers(keycode, modifiers) {
+    if (keycode > 64 && keycode < 91) {
+      if (modifiers.shiftKey) {
+        return String.fromCharCode(keycode);
+      } else {
+        return String.fromCharCode(keycode).toLocaleLowerCase();
+      }
+    }
+    let key = keyFromKeyCode[keycode];
+    if (key) {
+      return key;
+    }
+  }
+
+  /**
+   * Infers the keycode from the given key
+   * @param {string} key The KeyboardEvent#key string
+   * @returns {number} The keycode for the given key
+   */
+  function keyCodeFromKey(key) {
+    let keys = Object.keys(keyFromKeyCode);
+    let keyCode = keys.find(keyCode => keyFromKeyCode[keyCode] === key);
+    if (!keyCode) {
+      keyCode = keys.find(keyCode => keyFromKeyCode[keyCode] === key.toLowerCase());
+    }
+    return parseInt(keyCode);
+  }
+
+  /**
+    Triggers a keyboard event of given type in the target element.
+    It also requires the developer to provide either a string with the [`key`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values)
+    or the numeric [`keyCode`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode) of the pressed key.
+    Optionally the user can also provide a POJO with extra modifiers for the event.
   
     @public
     @param {string|Element} target the element or selector to trigger the event on
     @param {'keydown' | 'keyup' | 'keypress'} eventType the type of event to trigger
-    @param {string} keyCode the keyCode of the event being triggered
+    @param {number|string} key the `keyCode`(number) or `key`(string) of the event being triggered
     @param {Object} [modifiers] the state of various modifier keys
     @param {boolean} [modifiers.ctrlKey=false] if true the generated event will indicate the control key was pressed during the key event
     @param {boolean} [modifiers.altKey=false] if true the generated event will indicate the alt key was pressed during the key event
@@ -8920,7 +9018,7 @@ define('@ember/test-helpers/dom/trigger-key-event', ['exports', '@ember/test-hel
     @param {boolean} [modifiers.metaKey=false] if true the generated event will indicate the meta key was pressed during the key event
     @return {Promise<void>} resolves when the application is settled
   */
-  function triggerKeyEvent(target, eventType, keyCode, modifiers = DEFAULT_MODIFIERS) {
+  function triggerKeyEvent(target, eventType, key, modifiers = DEFAULT_MODIFIERS) {
     return (0, _utils.nextTickPromise)().then(() => {
       if (!target) {
         throw new Error('Must pass an element or selector to `triggerKeyEvent`.');
@@ -8940,11 +9038,17 @@ define('@ember/test-helpers/dom/trigger-key-event', ['exports', '@ember/test-hel
         throw new Error(`Must provide an \`eventType\` of ${validEventTypes} to \`triggerKeyEvent\` but you passed \`${eventType}\`.`);
       }
 
-      if (!keyCode) {
-        throw new Error(`Must provide a \`keyCode\` to \`triggerKeyEvent\``);
+      if (typeof key !== 'number' && typeof key !== 'string') {
+        throw new Error(`Must provide a \`key\` or \`keyCode\` to \`triggerKeyEvent\``);
       }
-
-      let options = Ember.merge({ keyCode, which: keyCode, key: keyCode }, modifiers);
+      let props;
+      if (typeof key === 'number') {
+        props = { keyCode: key, which: key, key: keyFromKeyCodeAndModifiers(key, modifiers) };
+      } else {
+        let keyCode = keyCodeFromKey(key);
+        props = { keyCode, which: keyCode, key };
+      }
+      let options = Ember.merge(props, modifiers);
 
       (0, _fireEvent.default)(element, eventType, options);
 
@@ -8969,10 +9073,10 @@ define('@ember/test-helpers/dom/wait-for', ['exports', '@ember/test-helpers/wait
     @param {string} selector the selector to wait for
     @param {Object} [options] the options to be used
     @param {number} [options.timeout=1000] the time to wait (in ms) for a match
-    @param {number} [options.count=1] the number of elements that should match the provided selector
+    @param {number} [options.count=null] the number of elements that should match the provided selector (null means one or more)
     @returns {Element|Array<Element>} the element (or array of elements) that were being waited upon
   */
-  function waitFor(selector, { timeout = 1000, count = null } = {}) {
+  function waitFor(selector, { timeout = 1000, count = null, timeoutMessage = 'waitFor timed out' } = {}) {
     return (0, _utils.nextTickPromise)().then(() => {
       if (!selector) {
         throw new Error('Must pass a selector to `waitFor`.');
@@ -8989,7 +9093,7 @@ define('@ember/test-helpers/dom/wait-for', ['exports', '@ember/test-helpers/wait
       } else {
         callback = () => (0, _getElement.default)(selector);
       }
-      return (0, _waitUntil.default)(callback, { timeout });
+      return (0, _waitUntil.default)(callback, { timeout, timeoutMessage });
     });
   }
 });
@@ -9316,7 +9420,11 @@ define('@ember/test-helpers/settled', ['exports', '@ember/test-helpers/-utils', 
   // properly consider pending AJAX requests done within legacy acceptance tests.
   const _internalPendingRequests = (() => {
     if (Ember.__loader.registry['ember-testing/test/pending_requests']) {
+      // Ember <= 3.1
       return Ember.__loader.require('ember-testing/test/pending_requests').pendingRequests;
+    } else if (Ember.__loader.registry['ember-testing/lib/test/pending_requests']) {
+      // Ember >= 3.2
+      return Ember.__loader.require('ember-testing/lib/test/pending_requests').pendingRequests;
     }
 
     return () => 0;
@@ -9401,7 +9509,11 @@ define('@ember/test-helpers/settled', ['exports', '@ember/test-helpers/-utils', 
 
   let _internalCheckWaiters;
   if (Ember.__loader.registry['ember-testing/test/waiters']) {
+    // Ember <= 3.1
     _internalCheckWaiters = Ember.__loader.require('ember-testing/test/waiters').checkWaiters;
+  } else if (Ember.__loader.registry['ember-testing/lib/test/waiters']) {
+    // Ember >= 3.2
+    _internalCheckWaiters = Ember.__loader.require('ember-testing/lib/test/waiters').checkWaiters;
   }
 
   /**
@@ -9609,31 +9721,46 @@ define('@ember/test-helpers/setup-context', ['exports', '@ember/test-helpers/bui
 
       return (0, _buildOwner.default)((0, _application.getApplication)(), (0, _resolver.getResolver)());
     }).then(owner => {
-      context.owner = owner;
+      Object.defineProperty(context, 'owner', {
+        value: owner,
+        writable: false
+      });
 
-      context.set = function (key, value) {
-        let ret = Ember.run(function () {
-          return Ember.set(context, key, value);
-        });
+      Object.defineProperty(context, 'set', {
+        value(key, value) {
+          let ret = Ember.run(function () {
+            return Ember.set(context, key, value);
+          });
 
-        return ret;
-      };
+          return ret;
+        },
+        writable: false
+      });
 
-      context.setProperties = function (hash) {
-        let ret = Ember.run(function () {
-          return Ember.setProperties(context, hash);
-        });
+      Object.defineProperty(context, 'setProperties', {
+        value(hash) {
+          let ret = Ember.run(function () {
+            return Ember.setProperties(context, hash);
+          });
 
-        return ret;
-      };
+          return ret;
+        },
+        writable: false
+      });
 
-      context.get = function (key) {
-        return Ember.get(context, key);
-      };
+      Object.defineProperty(context, 'get', {
+        value(key) {
+          return Ember.get(context, key);
+        },
+        writable: false
+      });
 
-      context.getProperties = function (...args) {
-        return Ember.getProperties(context, args);
-      };
+      Object.defineProperty(context, 'getProperties', {
+        value(...args) {
+          return Ember.getProperties(context, args);
+        },
+        writable: false
+      });
 
       let resume;
       context.resumeTest = function resumeTest() {
@@ -9933,11 +10060,14 @@ define('@ember/test-helpers/setup-rendering-context', ['exports', '@ember/test-h
       // these methods being placed on the context itself will be deprecated in
       // a future version (no giant rush) to remove some confusion about which
       // is the "right" way to things...
-      context.render = render;
-      context.clearRender = clearRender;
+      Object.defineProperty(context, 'render', { value: render, writable: false });
+      Object.defineProperty(context, 'clearRender', {
+        value: clearRender,
+        writable: false
+      });
 
       if (_global.default.jQuery) {
-        context.$ = jQuerySelector;
+        Object.defineProperty(context, '$', { value: jQuerySelector, writable: false });
       }
 
       // When the host app uses `setApplication` (instead of `setResolver`) the event dispatcher has
@@ -9966,18 +10096,18 @@ define('@ember/test-helpers/setup-rendering-context', ['exports', '@ember/test-h
         return (0, _settled.default)();
       });
     }).then(() => {
-      // ensure the element is based on the wrapping toplevel view
-      // Ember still wraps the main application template with a
-      // normal tagged view
-      //
-      // In older Ember versions (2.4) the element itself is not stable,
-      // and therefore we cannot update the `this.element` until after the
-      // rendering is completed
-      if (EmberENV._APPLICATION_TEMPLATE_WRAPPER !== false) {
-        context.element = (0, _getRootElement.default)().querySelector('.ember-view');
-      } else {
-        context.element = (0, _getRootElement.default)();
-      }
+      Object.defineProperty(context, 'element', {
+        // ensure the element is based on the wrapping toplevel view
+        // Ember still wraps the main application template with a
+        // normal tagged view
+        //
+        // In older Ember versions (2.4) the element itself is not stable,
+        // and therefore we cannot update the `this.element` until after the
+        // rendering is completed
+        value: EmberENV._APPLICATION_TEMPLATE_WRAPPER !== false ? (0, _getRootElement.default)().querySelector('.ember-view') : (0, _getRootElement.default)(),
+
+        writable: false
+      });
 
       return context;
     });
@@ -10149,13 +10279,15 @@ define('@ember/test-helpers/wait-until', ['exports', '@ember/test-helpers/-utils
     @param {Function} callback the callback to use for testing when waiting should stop
     @param {Object} [options] options used to override defaults
     @param {number} [options.timeout=1000] the maximum amount of time to wait
+    @param {string} [options.timeoutMessage='waitUntil timed out'] the message to use in the reject on timeout
     @returns {Promise} resolves with the callback value when it returns a truthy value
   */
   function waitUntil(callback, options = {}) {
     let timeout = 'timeout' in options ? options.timeout : 1000;
+    let timeoutMessage = 'timeoutMessage' in options ? options.timeoutMessage : 'waitUntil timed out';
 
     // creating this error eagerly so it has the proper invocation stack
-    let waitUntilTimedOut = new Error('waitUntil timed out');
+    let waitUntilTimedOut = new Error(timeoutMessage);
 
     return new Ember.RSVP.Promise(function (resolve, reject) {
       let time = 0;

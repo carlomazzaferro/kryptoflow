@@ -49,17 +49,6 @@ class KafkaStream(metaclass=IterateStream):
                     'reddit': avro.load(os.path.join(SCHEMAS, 'reddit' + '.avsc')),
                     'twitter': avro.load(os.path.join(SCHEMAS, 'twitter' + '.avsc'))}
 
-    # def __init__(self, offset='end'):
-
-
-        # self.base_config = {'bootstrap.servers': self.ip + ':9092',
-        #                     'schema.registry.url': 'http://' + self.ip + ':8081'}
-
-        # self.key_schema = avro.load(os.path.join(SCHEMAS, 'keyschema.avsc'))
-        # self.value_schema = avro.load(os.path.join(SCHEMAS, self.topic + '.avsc'))
-        # # self.avro_consumer = self.setup_consumer(offset=offset)
-        # self.avro_consumer.subscribe([self.topic])
-
     @classmethod
     def producer(cls, topic=None, ip='localhost'):
         return AvroProducer({'bootstrap.servers': ip + ':9092',

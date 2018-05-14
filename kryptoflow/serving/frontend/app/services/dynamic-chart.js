@@ -21,5 +21,11 @@ export default Service.extend({
   updateSeriesCount(chartData, numSeries) {
     let chartDataCopy = copy(chartData, true);
     return chartDataCopy.slice(0, numSeries);
+  },
+
+  addDataPoint(chartData, point) {
+    console.log(point, 'PRICES');
+    chartData.addPoint(point.price, true)
   }
 });
+
