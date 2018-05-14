@@ -20,13 +20,14 @@ define('frontend/app', ['exports', 'frontend/resolver', 'ember-load-initializers
 
   exports.default = App;
 });
-define('frontend/components/chart-highstock-interactive', ['exports'], function (exports) {
+define('frontend/components/chart-highstock-interactive', ['exports', 'ember-highcharts/components/high-charts'], function (exports, _highCharts) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
   exports.default = Ember.Component.extend({
+
     dynamicChart: Ember.inject.service('dynamic-chart'),
     ajax: Ember.inject.service(),
 
@@ -38,15 +39,31 @@ define('frontend/components/chart-highstock-interactive', ['exports'], function 
         text: 'BTC-USD Live Data'
       }
     },
+    socketIOService: Ember.inject.service('socket-io'),
+    socketRef: null,
+    value: false,
+    cachedChartData: [],
+
+    onConnect() {
+      console.log('CONNECTED');
+    },
+
+    onMessage(data) {
+      let date = new Date(data.ts);
+      let ct = Ember.copy(this.get('chartData'));
+      ct[0].data.push([date.getTime(), data.price]);
+      this.set('chartData', ct);
+    },
 
     actions: {
+
       setFromServer() {
         this.get('ajax').request("http://0.0.0.0:5000/tf_api/historical_data/historical", {
           headers: { 'Accept': 'application/json' },
           method: 'GET',
           data: {
             max_points: 100,
-            offset: 935797
+            offset: 1392000
 
           }
         }).then(data => this.set('chartData', generateArray(data)));
@@ -62,6 +79,28 @@ define('frontend/components/chart-highstock-interactive', ['exports'], function 
       setSeriesCount(numSeries) {
         let newChartData = this.get('dynamicChart').updateSeriesCount(stockData, numSeries);
         this.set('chartData', newChartData);
+      },
+
+      buttonStart() {
+        if (this.value === false) {
+          this.set('value', true);
+          const socket = this.get('socketIOService').socketFor('http://0.0.0.0:5000/');
+          console.log(socket);
+          console.log(this.value);
+
+          this.socketRef = socket;
+          socket.on('connect', this.onConnect, this);
+          socket.on('price_event', this.onMessage, this);
+        } else {
+          this.set('value', false);
+
+          this.get('socketIOService').closeSocketFor('http://0.0.0.0:5000/');
+
+          console.log('livestream interrupted');
+          console.log('state' + this.value);
+
+          this.socketRef = null;
+        }
       }
     }
   });
@@ -968,6 +1007,17 @@ define('frontend/components/tether-dialog', ['exports', 'ember-modal-dialog/comp
     }
   });
 });
+define('frontend/components/websocket-client', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Component.extend({
+
+    actions: {}
+  });
+});
 define('frontend/components/welcome-page', ['exports', 'ember-welcome-page/components/welcome-page'], function (exports, _welcomePage) {
   'use strict';
 
@@ -981,6 +1031,50 @@ define('frontend/components/welcome-page', ['exports', 'ember-welcome-page/compo
     }
   });
 });
+define('frontend/components/x-toggle-label', ['exports', 'ember-toggle/components/x-toggle-label/component'], function (exports, _component) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _component.default;
+    }
+  });
+});
+define('frontend/components/x-toggle-switch', ['exports', 'ember-toggle/components/x-toggle-switch/component'], function (exports, _component) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _component.default;
+    }
+  });
+});
+define('frontend/components/x-toggle', ['exports', 'ember-toggle/components/x-toggle/component', 'frontend/config/environment'], function (exports, _component, _environment) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+
+  const config = _environment.default['ember-toggle'] || {};
+
+  exports.default = _component.default.extend({
+    theme: config.defaultTheme || 'default',
+    defaultOffLabel: config.defaultOffLabel || 'Off::off',
+    defaultOnLabel: config.defaultOnLabel || 'On::on',
+    showLabels: config.defaultShowLabels || false,
+    size: config.defaultSize || 'medium'
+  });
+});
 define('frontend/controllers/chart-highstock-interactive', ['exports'], function (exports) {
   'use strict';
 
@@ -988,6 +1082,108 @@ define('frontend/controllers/chart-highstock-interactive', ['exports'], function
     value: true
   });
   exports.default = Ember.Controller.extend({});
+});
+define('frontend/ember-gestures/recognizers/pan', ['exports', 'ember-gestures/recognizers/pan'], function (exports, _pan) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _pan.default;
+});
+define('frontend/ember-gestures/recognizers/pinch', ['exports', 'ember-gestures/recognizers/pinch'], function (exports, _pinch) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _pinch.default;
+});
+define('frontend/ember-gestures/recognizers/press', ['exports', 'ember-gestures/recognizers/press'], function (exports, _press) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _press.default;
+});
+define('frontend/ember-gestures/recognizers/rotate', ['exports', 'ember-gestures/recognizers/rotate'], function (exports, _rotate) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _rotate.default;
+});
+define('frontend/ember-gestures/recognizers/swipe', ['exports', 'ember-gestures/recognizers/swipe'], function (exports, _swipe) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _swipe.default;
+});
+define('frontend/ember-gestures/recognizers/tap', ['exports', 'ember-gestures/recognizers/tap'], function (exports, _tap) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _tap.default;
+    }
+  });
+});
+define('frontend/ember-gestures/recognizers/vertical-pan', ['exports', 'ember-gestures/recognizers/vertical-pan'], function (exports, _verticalPan) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _verticalPan.default;
+    }
+  });
+});
+define('frontend/ember-gestures/recognizers/vertical-swipe', ['exports', 'ember-gestures/recognizers/vertical-swipe'], function (exports, _verticalSwipe) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _verticalSwipe.default;
+    }
+  });
+});
+define('frontend/event_dispatcher', ['exports', 'ember-gestures/event_dispatcher', 'frontend/config/environment'], function (exports, _event_dispatcher, _environment) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+
+  const merge = Ember.assign || Ember.merge;
+
+  let gestures = merge({}, {
+    emberUseCapture: false,
+    removeTracking: false,
+    useFastPaths: false
+  });
+  gestures = merge(gestures, _environment.default.gestures);
+
+  exports.default = _event_dispatcher.default.extend({
+    useCapture: gestures.emberUseCapture,
+    removeTracking: gestures.removeTracking,
+    useFastPaths: gestures.useFastPaths
+  });
 });
 define('frontend/helpers/and', ['exports', 'ember-truth-helpers/helpers/and'], function (exports, _and) {
   'use strict';
@@ -1014,24 +1210,31 @@ define('frontend/helpers/app-version', ['exports', 'frontend/config/environment'
     value: true
   });
   exports.appVersion = appVersion;
-
-
-  const {
-    APP: {
-      version
-    }
-  } = _environment.default;
-
   function appVersion(_, hash = {}) {
-    if (hash.hideSha) {
-      return version.match(_regexp.versionRegExp)[0];
+    const version = _environment.default.APP.version;
+    // e.g. 1.0.0-alpha.1+4jds75hf
+
+    // Allow use of 'hideSha' and 'hideVersion' For backwards compatibility
+    let versionOnly = hash.versionOnly || hash.hideSha;
+    let shaOnly = hash.shaOnly || hash.hideVersion;
+
+    let match = null;
+
+    if (versionOnly) {
+      if (hash.showExtended) {
+        match = version.match(_regexp.versionExtendedRegExp); // 1.0.0-alpha.1
+      }
+      // Fallback to just version
+      if (!match) {
+        match = version.match(_regexp.versionRegExp); // 1.0.0
+      }
     }
 
-    if (hash.hideVersion) {
-      return version.match(_regexp.shaRegExp)[0];
+    if (shaOnly) {
+      match = version.match(_regexp.shaRegExp); // 4jds75hf
     }
 
-    return version;
+    return match ? match[0] : version;
   }
 
   exports.default = Ember.Helper.helper(appVersion);
@@ -1328,6 +1531,17 @@ define('frontend/initializers/ember-data', ['exports', 'ember-data/setup-contain
     initialize: _setupContainer.default
   };
 });
+define('frontend/initializers/ember-hammertime', ['exports', 'ember-hammertime/components/component'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = {
+    name: 'ember-hammertime',
+    initialize() {}
+  };
+});
 define('frontend/initializers/ember-keyboard-first-responder-inputs', ['exports', 'ember-keyboard/initializers/ember-keyboard-first-responder-inputs'], function (exports, _emberKeyboardFirstResponderInputs) {
   'use strict';
 
@@ -1465,6 +1679,30 @@ define("frontend/instance-initializers/ember-data", ["exports", "ember-data/init
     initialize: _initializeStoreService.default
   };
 });
+define('frontend/instance-initializers/ember-gestures', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+
+  const { getOwner } = Ember;
+
+  exports.default = {
+    name: 'ember-gestures',
+
+    initialize: function (instance) {
+      if (typeof instance.lookup === "function") {
+        instance.lookup('service:-gestures');
+      } else {
+        // This can be removed when we no-longer support ember 1.12 and 1.13
+        getOwner(instance).lookup('service:-gestures');
+      }
+    }
+
+  };
+});
 define('frontend/resolver', ['exports', 'ember-resolver'], function (exports, _emberResolver) {
   'use strict';
 
@@ -1526,6 +1764,25 @@ define('frontend/routes/index', ['exports'], function (exports) {
   });
   exports.default = Ember.Route.extend({});
 });
+define('frontend/services/-gestures', ['exports', 'frontend/config/environment', 'ember-gestures/services/-gestures'], function (exports, _environment, _gestures) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+
+  const merge = Ember.assign || Ember.merge;
+
+  let gestures = merge({}, {
+    useCapture: false
+  });
+  gestures = merge(gestures, _environment.default.gestures);
+
+  exports.default = _gestures.default.extend({
+    useCapture: gestures.useCapture
+  });
+});
 define('frontend/services/ajax', ['exports', 'ember-ajax/services/ajax'], function (exports, _ajax) {
   'use strict';
 
@@ -1564,6 +1821,11 @@ define('frontend/services/dynamic-chart', ['exports'], function (exports) {
     updateSeriesCount(chartData, numSeries) {
       let chartDataCopy = Ember.copy(chartData, true);
       return chartDataCopy.slice(0, numSeries);
+    },
+
+    addDataPoint(chartData, point) {
+      console.log(point, 'PRICES');
+      chartData.addPoint(point.price, true);
     }
   });
 });
@@ -1601,6 +1863,32 @@ define('frontend/services/modal-dialog', ['exports', 'ember-modal-dialog/service
   });
   exports.default = _modalDialog.default;
 });
+define('frontend/services/socket-io', ['exports', 'ember-websockets/services/socket-io'], function (exports, _socketIo) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _socketIo.default;
+    }
+  });
+});
+define('frontend/services/websockets', ['exports', 'ember-websockets/services/websockets'], function (exports, _websockets) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _websockets.default;
+    }
+  });
+});
 define("frontend/templates/application", ["exports"], function (exports) {
   "use strict";
 
@@ -1615,7 +1903,7 @@ define("frontend/templates/charts", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "czc7csdU", "block": "{\"symbols\":[],\"statements\":[[6,\"div\"],[10,\"class\",\"container-fluid\"],[8],[0,\"\\n\\n  \"],[6,\"section\"],[8],[0,\"\\n    \"],[6,\"h3\"],[8],[0,\"Live Data\"],[9],[0,\"\\n    \"],[1,[20,\"chart-highstock-interactive\"],false],[0,\"\\n  \"],[9],[0,\"\\n\\n\"],[9]],\"hasEval\":false}", "meta": { "moduleName": "frontend/templates/charts.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "4JwBRLcV", "block": "{\"symbols\":[],\"statements\":[[6,\"div\"],[10,\"class\",\"container-fluid\"],[8],[0,\"\\n    \"],[6,\"div\"],[10,\"class\",\"menu\"],[8],[0,\"\\n      \"],[6,\"section\"],[8],[0,\"\\n        \"],[1,[20,\"chart-highstock-interactive\"],false],[0,\"\\n      \"],[9],[0,\"\\n    \"],[9],[0,\"\\n\\n\"],[9]],\"hasEval\":false}", "meta": { "moduleName": "frontend/templates/charts.hbs" } });
 });
 define("frontend/templates/components/chart-highstock-interactive", ["exports"], function (exports) {
   "use strict";
@@ -1623,7 +1911,7 @@ define("frontend/templates/components/chart-highstock-interactive", ["exports"],
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "dVPYj7lk", "block": "{\"symbols\":[],\"statements\":[[6,\"button\"],[10,\"class\",\"btn btn-default\"],[10,\"type\",\"button\"],[3,\"action\",[[21,0,[]],\"updateSeriesData\"]],[8],[0,\"Update Series Data\"],[9],[0,\"\\n\"],[6,\"button\"],[10,\"class\",\"btn btn-default\"],[10,\"type\",\"button\"],[3,\"action\",[[21,0,[]],\"setSeriesCount\",0]],[8],[0,\"Zero Series\"],[9],[0,\"\\n\"],[6,\"button\"],[10,\"class\",\"btn btn-default\"],[10,\"type\",\"button\"],[3,\"action\",[[21,0,[]],\"setSeriesCount\",1]],[8],[0,\"One Series\"],[9],[0,\"\\n\"],[6,\"button\"],[10,\"class\",\"btn btn-default\"],[10,\"type\",\"button\"],[3,\"action\",[[21,0,[]],\"setSeriesCount\",2]],[8],[0,\"Two Series\"],[9],[0,\"\\n\"],[6,\"button\"],[10,\"class\",\"btn btn-default\"],[10,\"type\",\"button\"],[3,\"action\",[[21,0,[]],\"setFromServer\",2]],[8],[0,\"From Server\"],[9],[0,\"\\n\\n\"],[1,[26,\"high-charts\",null,[[\"mode\",\"content\",\"chartOptions\"],[\"StockChart\",[22,[\"chartData\"]],[22,[\"chartOptions\"]]]]],false]],\"hasEval\":false}", "meta": { "moduleName": "frontend/templates/components/chart-highstock-interactive.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "N/7VFRWQ", "block": "{\"symbols\":[\"toggle\"],\"statements\":[[6,\"button\"],[10,\"class\",\"btn btn-default\"],[10,\"type\",\"button\"],[3,\"action\",[[21,0,[]],\"updateSeriesData\"]],[8],[0,\"Update Series Data\"],[9],[0,\"\\n\"],[6,\"button\"],[10,\"class\",\"btn btn-default\"],[10,\"type\",\"button\"],[3,\"action\",[[21,0,[]],\"setSeriesCount\",0]],[8],[0,\"Zero Series\"],[9],[0,\"\\n\"],[6,\"button\"],[10,\"class\",\"btn btn-default\"],[10,\"type\",\"button\"],[3,\"action\",[[21,0,[]],\"setSeriesCount\",1]],[8],[0,\"One Series\"],[9],[0,\"\\n\"],[6,\"button\"],[10,\"class\",\"btn btn-default\"],[10,\"type\",\"button\"],[3,\"action\",[[21,0,[]],\"setFromServer\",2]],[8],[0,\"From Server\"],[9],[0,\"\\n\"],[4,\"x-toggle\",null,[[\"value\",\"showLabels\",\"onToggle\"],[[22,[\"value\"]],true,[26,\"action\",[[21,0,[]],\"buttonStart\",[22,[\"value\"]]],null]]],{\"statements\":[[4,\"component\",[[21,1,[\"label\"]]],[[\"value\"],[[26,\"not\",[[22,[\"value\"]]],null]]],{\"statements\":[[0,\"    \"],[6,\"b\"],[8],[0,\"Live Data\"],[9],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"\\n  \"],[1,[26,\"component\",[[21,1,[\"switch\"]]],[[\"theme\"],[\"material\"]]],false],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"\\n\"],[1,[26,\"high-charts\",null,[[\"mode\",\"content\",\"chartOptions\"],[\"StockChart\",[22,[\"chartData\"]],[22,[\"chartOptions\"]]]]],false]],\"hasEval\":false}", "meta": { "moduleName": "frontend/templates/components/chart-highstock-interactive.hbs" } });
 });
 define('frontend/templates/components/modal-dialog', ['exports', 'ember-modal-dialog/templates/components/modal-dialog'], function (exports, _modalDialog) {
   'use strict';
@@ -1650,6 +1938,14 @@ define('frontend/templates/components/tether-dialog', ['exports', 'ember-modal-d
       return _tetherDialog.default;
     }
   });
+});
+define("frontend/templates/components/websocket-client", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "joWv4/cO", "block": "{\"symbols\":[\"&default\"],\"statements\":[[13,1]],\"hasEval\":false}", "meta": { "moduleName": "frontend/templates/components/websocket-client.hbs" } });
 });
 define("frontend/templates/index", ["exports"], function (exports) {
   "use strict";

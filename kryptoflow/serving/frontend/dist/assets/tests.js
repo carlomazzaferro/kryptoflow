@@ -12,7 +12,12 @@ define('frontend/tests/app.lint-test', [], function () {
 
   QUnit.test('components/chart-highstock-interactive.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'components/chart-highstock-interactive.js should pass ESLint\n\n1:10 - \'copy\' is defined but never used. (no-unused-vars)\n9:9 - Use import { inject } from \'@ember/service\'; instead of using Ember.inject.service (ember/new-module-imports)\n11:3 - Only string, number, symbol, boolean, null, undefined, and function are allowed as default properties (ember/avoid-leaking-state-in-ember-objects)\n36:68 - \'stockData\' is not defined. (no-undef)\n37:7 - Unexpected console statement. (no-console)\n42:69 - \'stockData\' is not defined. (no-undef)');
+    assert.ok(false, 'components/chart-highstock-interactive.js should pass ESLint\n\n5:8 - \'EmberHighChartsComponent\' is defined but never used. (no-unused-vars)\n11:9 - Use import { inject } from \'@ember/service\'; instead of using Ember.inject.service (ember/new-module-imports)\n13:3 - Only string, number, symbol, boolean, null, undefined, and function are allowed as default properties (ember/avoid-leaking-state-in-ember-objects)\n24:3 - Only string, number, symbol, boolean, null, undefined, and function are allowed as default properties (ember/avoid-leaking-state-in-ember-objects)\n27:5 - Unexpected console statement. (no-console)\n53:68 - \'stockData\' is not defined. (no-undef)\n54:7 - Unexpected console statement. (no-console)\n59:69 - \'stockData\' is not defined. (no-undef)\n67:9 - Unexpected console statement. (no-console)\n68:9 - Unexpected console statement. (no-console)\n80:9 - Unexpected console statement. (no-console)\n81:9 - Unexpected console statement. (no-console)');
+  });
+
+  QUnit.test('components/websocket-client.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'components/websocket-client.js should pass ESLint\n\n');
   });
 
   QUnit.test('controllers/chart-highstock-interactive.js', function (assert) {
@@ -52,7 +57,7 @@ define('frontend/tests/app.lint-test', [], function () {
 
   QUnit.test('services/dynamic-chart.js', function (assert) {
     assert.expect(1);
-    assert.ok(true, 'services/dynamic-chart.js should pass ESLint\n\n');
+    assert.ok(false, 'services/dynamic-chart.js should pass ESLint\n\n27:5 - Unexpected console statement. (no-console)');
   });
 });
 define('frontend/tests/helpers/ember-keyboard/register-test-helpers', ['exports', 'ember-keyboard'], function (exports, _emberKeyboard) {
@@ -90,6 +95,35 @@ define('frontend/tests/helpers/ember-keyboard/register-test-helpers', ['exports'
     return app.testHelpers.triggerEvent(document, type, event);
   };
 });
+define('frontend/tests/integration/components/websocket-client-test', ['qunit', 'ember-qunit', '@ember/test-helpers'], function (_qunit, _emberQunit, _testHelpers) {
+  'use strict';
+
+  (0, _qunit.module)('Integration | Component | websocket-client', function (hooks) {
+    (0, _emberQunit.setupRenderingTest)(hooks);
+
+    (0, _qunit.test)('it renders', async function (assert) {
+      // Set any properties with this.set('myProperty', 'value');
+      // Handle any actions with this.set('myAction', function(val) { ... });
+
+      await (0, _testHelpers.render)(Ember.HTMLBars.template({
+        "id": "Y4V3T4Hl",
+        "block": "{\"symbols\":[],\"statements\":[[1,[20,\"websocket-client\"],false]],\"hasEval\":false}",
+        "meta": {}
+      }));
+
+      assert.equal(this.element.textContent.trim(), '');
+
+      // Template block usage:
+      await (0, _testHelpers.render)(Ember.HTMLBars.template({
+        "id": "CnRxbC6n",
+        "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[4,\"websocket-client\",null,null,{\"statements\":[[0,\"        template block text\\n\"]],\"parameters\":[]},null],[0,\"    \"]],\"hasEval\":false}",
+        "meta": {}
+      }));
+
+      assert.equal(this.element.textContent.trim(), 'template block text');
+    });
+  });
+});
 define('frontend/tests/test-helper', ['frontend/app', 'frontend/config/environment', '@ember/test-helpers', 'ember-qunit'], function (_app, _environment, _testHelpers, _emberQunit) {
   'use strict';
 
@@ -101,6 +135,11 @@ define('frontend/tests/tests.lint-test', [], function () {
   'use strict';
 
   QUnit.module('ESLint | tests');
+
+  QUnit.test('integration/components/websocket-client-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'integration/components/websocket-client-test.js should pass ESLint\n\n');
+  });
 
   QUnit.test('test-helper.js', function (assert) {
     assert.expect(1);
@@ -150,6 +189,11 @@ define('frontend/tests/tests.lint-test', [], function () {
   QUnit.test('unit/services/dynamic-chart-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'unit/services/dynamic-chart-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('unit/services/websocket-client-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/services/websocket-client-test.js should pass ESLint\n\n');
   });
 
   QUnit.test('units/charts/gdax-test.js', function (assert) {
@@ -267,6 +311,19 @@ define('frontend/tests/unit/services/dynamic-chart-test', ['qunit', 'ember-qunit
     // Replace this with your real tests.
     (0, _qunit.test)('it exists', function (assert) {
       let service = this.owner.lookup('service:dynamic-chart');
+      assert.ok(service);
+    });
+  });
+});
+define('frontend/tests/unit/services/websocket-client-test', ['qunit', 'ember-qunit'], function (_qunit, _emberQunit) {
+  'use strict';
+
+  (0, _qunit.module)('Unit | Service | websocket-client', function (hooks) {
+    (0, _emberQunit.setupTest)(hooks);
+
+    // Replace this with your real tests.
+    (0, _qunit.test)('it exists', function (assert) {
+      let service = this.owner.lookup('service:websocket-client');
       assert.ok(service);
     });
   });
