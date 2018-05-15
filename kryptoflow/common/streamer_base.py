@@ -14,9 +14,14 @@ _logger = logging.getLogger('root')
 
 class AvroAsync(object):
 
-    def __init__(self, topic=None, ip='localhost'):
+    def __init__(self, topic=None, ip=None):
         self.topic = topic
-        self.ip = ip  # os.environ['KAFKA_SERVER_IP']
+        if not ip:
+            try:
+                self.ip = os.environ['KAFKA_SERVER_IP']
+            except KeyError:
+                self.ip = 'localhost'
+
         self.base_config = {'bootstrap.servers': self.ip + ':9092',
                             'schema.registry.url': 'http://' + self.ip + ':8081'}
 
