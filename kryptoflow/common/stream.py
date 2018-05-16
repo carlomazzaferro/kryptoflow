@@ -50,14 +50,16 @@ class KafkaStream(metaclass=IterateStream):
                     'twitter': avro.load(os.path.join(SCHEMAS, 'twitter' + '.avsc'))}
 
     @classmethod
-    def producer(cls, topic=None, ip='localhost'):
+    def producer(cls, topic='gdax'):
+        ip = cls.determine_ip()
         return AvroProducer({'bootstrap.servers': ip + ':9092',
                              'schema.registry.url': 'http://' + ip + ':8081'},
                             default_key_schema=cls.KEY_SCHEMA[topic],
                             default_value_schema=cls.VALUE_SCHEMA)
 
     @classmethod
-    def consumer(cls, topic='gdax', ip='localhost', offset='start'):
+    def consumer(cls, topic='gdax', offset='start'):
+        ip = cls.determine_ip()
         try:
             _offset = cls.OFFSETS[offset]
             _config = cls.CONFIG[offset]
@@ -76,5 +78,12 @@ class KafkaStream(metaclass=IterateStream):
         cls.avro_consumer.assign([TopicPartition(topic, partition=0, offset=_offset)])
 
         return cls
+
+    @staticmethod
+    def determine_ip():
+        try:
+            return os.environ['KAFKA_SERVER_IP']
+        except KeyError:
+            return 'localhost'
 
 
