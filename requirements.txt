@@ -13,3 +13,4 @@ scikit-learn
 flask
 flask-cors
 sortedcontainers
+kafka-tfrx
