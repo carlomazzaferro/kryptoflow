@@ -1,16 +1,17 @@
 import os
 import logging
 
+from datetime import datetime, timedelta
 import pandas
 from keras import backend as K
 from keras.models import model_from_json
 from sklearn.externals import joblib
 from tensorflow.python.saved_model import builder as saved_model_builder, tag_constants
 from tensorflow.python.saved_model.signature_def_utils_impl import predict_signature_def
+from rx import Observable, Observer
 
 from kryptoflow.definitions import SAVED_MODELS
-from kryptoflow import definitions
-from kryptoflow.common.stream import KafkaStream
+from kafka_tfrx.stream import KafkaStream
 from kryptoflow.ml.dataset import one_hot_encode
 
 
@@ -28,19 +29,22 @@ def rows_to_df(rows, categorical=list([])):
     return df
 
 
-def get_data(topic, keep_keys=list(['ts']), categorical=list(['side'])):
+def stream_from_start(observer):
+    stream = KafkaStream.avro_consumer(topic='gdax', offset='start')
+    source = Observable \
+        .from_(stream) \
+        .subscribe(observer())
 
-    consumer = KafkaStream(topic=topic)
-    data = consumer.read_from_start(return_msgs=True)
-    rows = [{k: v for k, v in msg.items() if k in keep_keys} for msg in data]
-    return rows_to_df(rows, categorical=categorical)
 
+def get_historic_data(offset, max_points=50000):
+    stream = KafkaStream.avro_consumer(topic='gdax', offset=offset)
+    source = Observable \
+        .from_(stream) \
+        .take_while(lambda value: datetime.now() -
+                                  datetime.strptime(value['ts'], '%Y-%m-%d %H:%M:%S') > timedelta(seconds=5))
 
-def accumulate_data(time_steps=definitions.TIMEFRAME):
-    consumer = KafkaStream(topic='gdax')
-    messages = consumer.read_new(accumulate=True, n_messages=time_steps, unique=True)
-    rows = [{k: v for k, v in msg.items() if k in ['ts', 'price', 'volume_24h', 'spread', 'side']} for msg in messages]
-    return rows_to_df(rows, categorical=list(['side']))
+    a = source.to_blocking()
+    return [msg for msg in a][-max_points:]
 
 
 class ModelImporter(object):
