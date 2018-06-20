@@ -22,7 +22,7 @@ entry_points = """
 
 def setup_package():
     setup(entry_points=entry_points,
-          version='0.12',
+          version='0.2',
           tests_require=['pytest', 'pytest-cov', 'pytest-runner'],
           packages=find_packages(exclude=['docs', 'tests'], include=['kryptoflow']))
 
