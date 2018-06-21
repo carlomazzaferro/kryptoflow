@@ -22,9 +22,24 @@ entry_points = """
 
 def setup_package():
     setup(entry_points=entry_points,
-          version='0.2',
+          version='0.2.1',
+          install_requires=[
+              'confluent-kafka==0.11.4',
+              'rx==1.6.1',
+              'tweepy',
+              'ws4py',
+              'praw',
+              'pandas',
+              'git+git://github.com/Supervisor/supervisor',
+              'git+git://github.com/danpaquin/gdax-python',
+              'nltk',
+              'tweet-preprocessor==0.5.0',
+              'tensorflow',
+              'scikit-learn',
+              'sortedcontainers',
+              'kafka-tfrx'],
           tests_require=['pytest', 'pytest-cov', 'pytest-runner'],
-          packages=find_packages(exclude=['docs', 'tests'], include=['kryptoflow']))
+          packages=find_packages())
 
 
 if __name__ == "__main__":
