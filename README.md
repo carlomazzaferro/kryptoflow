@@ -9,6 +9,8 @@ Algorithmic crypto trading framework with Kafka and TensorFlow ([Keras](https://
 
 Documentation live at: https://carlomazzaferro.github.io/kryptoflow/index.html
 
+**STATUS**: pre-alpha. Very active development.
+
 Description
 ===========
 
