@@ -6,7 +6,7 @@ from sklearn.base import BaseEstimator
 import os
 import pytest
 from sklearn.datasets import make_classification
-from kryptoflow.models.model import SklearnModel
+from kryptoflow.models.model import SklearnModel, TrainableModel
 import shutil
 from kryptoflow.definitions import SAVED_MODELS
 
@@ -36,15 +36,15 @@ def sklearn_model():
 @pytest.fixture
 def serializer():
     skl = SklearnModel(artifact=sklearn_model)
-    skl.store(name='sklearn')
+    skl.store(name='clf')
 
 
 def test_serialization(sklearn_model):
     skl = SklearnModel(artifact=sklearn_model)
-    skl.store(name='sklearn')
-    assert os.path.exists(os.path.join(skl.model_path, 'sklearn' + '.mdl'))
-    skl.store(name='sklearn_2')
-    assert os.path.exists(os.path.join(skl.model_path, 'sklearn_2' + '.mdl'))
+    skl.store(name='clf')
+    assert os.path.exists(os.path.join(skl.model_path, 'clf' + '.mdl'))
+    skl.store(name='clf2')
+    assert os.path.exists(os.path.join(skl.model_path, 'clf2' + '.mdl'))
 
     # cleanup
     for root, dirs, files in os.walk(SAVED_MODELS):
@@ -56,14 +56,14 @@ def test_serialization(sklearn_model):
 
 def test_mulitple_serializations(sklearn_model):
     skl1 = SklearnModel(artifact=sklearn_model)
-    skl1.store(name='sklearn1')
+    skl1.store(name='clf1')
     assert os.path.exists(skl1.model_path)
 
     skl2 = SklearnModel(artifact=sklearn_model)
-    skl2.store(name='sklearn1')
+    skl2.store(name='clf2')
 
     skl3 = SklearnModel(artifact=sklearn_model)
-    skl3.store(name='sklearn1')
+    skl3.store(name='clf2')
     assert len(os.listdir(SAVED_MODELS)) == 3
 
     # cleanup
@@ -76,13 +76,13 @@ def test_mulitple_serializations(sklearn_model):
 
 def test_loader(sklearn_model):
     skl = SklearnModel(artifact=sklearn_model)
-    skl.store(name='sklearn')
-    reloaded = skl.load(name='sklearn')
+    skl.store(name='clf')
+    reloaded = skl.load(name='clf')
     assert isinstance(reloaded, BaseEstimator)
 
     skl2 = SklearnModel(artifact=sklearn_model)
-    skl2.store(name='sklearn')
-    reload_first = skl.load(run_number=1, name='sklearn')
+    skl2.store(name='clf')
+    reload_first = skl.load(run_number=1, name='clf')
     assert isinstance(reload_first, BaseEstimator)
 
     for root, dirs, files in os.walk(SAVED_MODELS):
@@ -90,3 +90,24 @@ def test_loader(sklearn_model):
             os.unlink(os.path.join(root, f))
         for d in dirs:
             shutil.rmtree(os.path.join(root, d))
+
+
+def test_trainable_model_from_file(sklearn_model):
+    skl = SklearnModel(artifact=sklearn_model)
+    # lr = LogisticRegression()
+    # trainable = TrainableModel(artifact=lr)
+
+    skl.store(name='clf')
+    trainable = TrainableModel.from_file(run_number=1, name='clf', model_type='sklearn')
+    assert isinstance(trainable.model, BaseEstimator)
+    for root, dirs, files in os.walk(SAVED_MODELS):
+        for f in files:
+            os.unlink(os.path.join(root, f))
+        for d in dirs:
+            shutil.rmtree(os.path.join(root, d))
+
+
+def test_trainable_model(sklearn_model):
+    trainable = TrainableModel(sklearn_model)
+    assert isinstance(trainable.model, BaseEstimator)
+    assert isinstance(trainable.serializer, SklearnModel)
