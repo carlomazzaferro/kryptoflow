@@ -89,3 +89,8 @@ services:
       - kafka1
       - kafka-schema-registry
       - kafka-rest-proxy
+  tf-serving:
+    container_name: tf-serving
+    build:
+      context: .
+      dockerfile: Dockerfile.tfserving
