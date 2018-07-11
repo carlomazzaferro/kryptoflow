@@ -1,8 +1,8 @@
 import abc
 import os
 import joblib
-from kryptoflow.serializer.model_io import ModelExporter, ModelImporter
-from kryptoflow.models import conf
+from subprocess import Popen, PIPE
+from kryptoflow.common.validation import check_model_type
 from kryptoflow.definitions import SAVED_MODELS
 import logging
 from typing import Type, Union
@@ -123,7 +123,6 @@ class KerasModel(Model):
         signature = predict_signature_def(inputs={'states': loaded_model.input},
                                           outputs={'price': loaded_model.output})
 
-
         builder.add_meta_graph_and_variables(sess=session,
                                              tags=[tag_constants.SERVING],
                                              signature_def_map={'predict': signature})
@@ -136,25 +135,48 @@ class TrainableModel(object):
 
     def __init__(self, artifact: Union[KerasBaseModel, BaseEstimator]):
         self.model = artifact
-        if isinstance(self.model, KerasBaseModel):
-            model_type = 'keras'
-        elif isinstance(self.model, BaseEstimator):
-            model_type = 'sklearn'
-        else:
-            raise ValueError('Model must be either a Keras complied model or an sklearn model')
-
-        self.serializer = {'sklearn': SklearnModel(), 'keras': KerasModel()}[model_type]
+        self.model_type = check_model_type(self.model)
+        self.serializer = {'sklearn': SklearnModel(), 'keras': KerasModel()}[self.model_type]
 
     def train(self, x_train, y_train):
         pass
 
     @classmethod
     def from_file(cls, run_number: Union[str, int]='last', name: str='clf', model_type: str='sklearn'):
-        if model_type not in conf.ALLOWABLE_MODLES:
-            raise ValueError('Model type must either of: %s' % ', '.join(conf.ALLOWABLE_MODLES))
+        check_model_type(model_type=model_type)
         serializer = {'sklearn': SklearnModel(), 'keras': KerasModel()}[model_type]
         return cls(artifact=serializer.load(run_number, name))
 
 
 class ServableModel(Model):
-    pass
+    def __init__(self, model_type: str, model_number: int):
+        super().__init__(model_type=model_type)
+        self.number = model_number
+        check_model_type(model_type=model_type)
+
+    def copy_to_container(self):
+        ctr_name = 'tf-serving'
+        model_dir = {'keras': os.path.join(self.model_path, 'tf'), 'sklearn': self.model_path}[self.model_type]
+        model_dest = ctr_name + ':/serving'
+        model_final_dest = os.path.join('/serving/', str(self.number))
+
+        print('docker cp %s %s' % (model_dir, model_dest))
+        p = Popen(('docker cp %s %s' % (model_dir, model_dest)).split(), shell=True,
+                  stdout=PIPE, stderr=PIPE)
+        if p.wait() != 0:
+            raise RuntimeError(p.stderr.read())
+
+        #  docker exec -it tf_serving mv /serving/tf /serving/$1
+        p = Popen(('docker exec %s mv /serving/tf %s' % (ctr_name, model_final_dest)).split(), shell=True,
+                  stdout=PIPE, stderr=PIPE)
+
+        if p.wait() != 0:
+            raise RuntimeError(p.stderr.read())
+
+        return p.stdout.read()
+
+    def serve(self):
+        pass
+
+        # docker exec -it tf_serving /serving/bazel-bin/tensorflow_serving/model_servers/tensorflow_model_server \
+        #                 --port=9000 --model_base_path=/serving/ &> gan_log &
