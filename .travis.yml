@@ -1,62 +1,26 @@
-sudo: required
 dist: trusty
-
-matrix:
-  include:
-  - language: python3
-
-    apt:
-      packages:
-      - python-dev
-
-    python:
-      - 3.6
-    cache:
-      directories:
-        - $HOME/backend/.pip-cache/
-
-    before_install:
-      - sudo apt-get -qq update
-      - sudo apt-get -y install python3-pip
-      - sudo apt-get install python-virtualenv
-
-    install:
-      - virtualenv  -p python3 ../flask_env
-      - source ../flask_env/bin/activate
-      - pip3 install -r backend/requirements/test.txt --cache-dir $HOME/backend/.pip-cache
-
-    script:
-      - python kryptoflow/serving/app.py >> log.txt 2>&1  &
-      - python kryptoflow/serving/app.py  > /dev/null &
-      - py.test --cov ../  ./backend/app/tests/test_api.py
-
-    after_success:
-      - bash <(curl -s https://codecov.io/bash)
-      - bash backend/scripts/gh_deploy.sh
-
-  - language: node_js
-    node_js:
-      - "6"
-
-    addons:
-      chrome: stable
-
-    cache:
-      directories:
-        - $HOME/kryptoflow/serving/frontend/.npm
-
-    env:
-      global:
-      # See https://git.io/vdao3 for details.
-      - JOBS=1
-
-    before_install:
-      - cd frontend
-      - npm install
-      - npm install -g ember-cli
-      - npm i eslint-plugin-ember@latest --save-dev
-      - npm config set spin false
-
-    script:
-      - npm run lint:js
-      - npm test
+sudo: required
+language: python
+python:
+- '3.5'
+- '3.6'
+before-install:
+- apt-get update -y
+- apt-get install -y software-properties-common
+- wget -qO - 'https://packages.confluent.io/deb/4.0/archive.key' | apt-key add -
+- add-apt-repository "deb [arch=amd64] https://packages.confluent.io/deb/4.0 stable
+  main"
+- apt-get install -y librdkafka-dev librdkafka1
+install:
+- pip install tox-travis
+script:
+- tox
+deploy:
+  provider: pypi
+  user: mazzafish
+  password:
+    secure: RnT88NBeljiG53WvSuuYIVUzKn7gvVgF6J6PGMrfdyGKPny77mvebt/ISnsMyPyDaXAgMiakUqx8jTjvHoKMAv4JeMQBpSLGBy2WFi/SWUhwY3VmCaZ35e9so46ro+ktwwbZsHMfYItztLTiyHpyIuf/0MHU4+cQip5UWxAPKhXmHpn6TUNTfMIHRJagNqrF15ymJEx68YMj9lmLX1nq7l0QcwmgEiJN+TrbC9Zjct7o8nHyQtzAkC+OLr52S13btjX2X1caZNiJsifqAnc0hzMuF9KrIaCk0qm5u7SB318rezbk9LLGU9m36I9AqF9d1HdSUXYzFpx0mLW0jCRiN+WqIPsUG++4+snaxCna5BAca9ljbsLHKgJbH+mHgjNFkJ7EwGVP4Ymb569a4JS71W3k9exPForPMjg2Bz9ZSRYDuJKoXArza7vt3ISDlcU+OWX1CbkMSQ5sq15P6Jd4QrMC2n5gDRC7bfSGo5bqvT8X4P73srJrWnitO9leyDBeR2ASolXLgqV4RkL1m/pHXtbLvlISCS+LiA570LvdGclAWkVjPTAxTzfcjgnuK1vcfvPjhWi6rHyY1fyiJR2jonl1qLozYUY3KXELBqladITUUJjaOj4287Q+z7aPQNz07M/1rUonSKEo+Gl6trBkCPcy+z3hlWBB391wCLQAGJ0=
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
+    branch: master
