@@ -1,5 +1,4 @@
-from models import conf
-from models.model import KerasBaseModel
+from kryptoflow.models import conf
 from sklearn.base import BaseEstimator
 
 
@@ -12,6 +11,7 @@ class ModelNameTypeError(Exception):
 
 
 def check_model_type(model_type=None, model=None):
+    from kryptoflow.models.model import KerasBaseModel
     if not model:
         if model_type not in conf.ALLOWABLE_MODLES:
             raise ModelNameTypeError('model_type must be either of: %s' % ', '.join(conf.ALLOWABLE_MODLES))
