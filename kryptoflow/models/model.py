@@ -1,10 +1,11 @@
 import abc
 import os
 import joblib
-from subprocess import Popen, PIPE
+import subprocess
 from kryptoflow.common.validation import check_model_type
 from kryptoflow.definitions import SAVED_MODELS
 import logging
+import docker
 from typing import Type, Union
 from sklearn.base import BaseEstimator
 from keras.engine.training import Model as KerasBaseModel
@@ -152,31 +153,32 @@ class ServableModel(Model):
     def __init__(self, model_type: str, model_number: int):
         super().__init__(model_type=model_type)
         self.number = model_number
+        self.model_dir = {'keras': os.path.join(self.model_path, 'tf/.'),
+                          'sklearn': self.model_path}[self.model_type]
+
         check_model_type(model_type=model_type)
 
     def copy_to_container(self):
         ctr_name = 'tf-serving'
-        model_dir = {'keras': os.path.join(self.model_path, 'tf'), 'sklearn': self.model_path}[self.model_type]
-        model_dest = ctr_name + ':/serving'
-        model_final_dest = os.path.join('/serving/', str(self.number))
+        model_final_dest = os.path.join('/serving/', self.model_type, str(self.number))
 
-        print('docker cp %s %s' % (model_dir, model_dest))
-        p = Popen(('docker cp %s %s' % (model_dir, model_dest)).split(), shell=True,
-                  stdout=PIPE, stderr=PIPE)
-        if p.wait() != 0:
-            raise RuntimeError(p.stderr.read())
-
-        #  docker exec -it tf_serving mv /serving/tf /serving/$1
-        p = Popen(('docker exec %s mv /serving/tf %s' % (ctr_name, model_final_dest)).split(), shell=True,
-                  stdout=PIPE, stderr=PIPE)
-
-        if p.wait() != 0:
-            raise RuntimeError(p.stderr.read())
-
-        return p.stdout.read()
+        mv_cmd = ('docker exec %s mkdir -p %s' % (ctr_name, model_final_dest)).split()
+        copy_cmd = ('docker cp %s %s:%s' % (self.model_dir, ctr_name, model_final_dest)).split()
+        subprocess.call(mv_cmd)
+        subprocess.call(copy_cmd)
 
     def serve(self):
-        pass
+        client = docker.from_env()
+        serving = client.containers.get('tf-serving')
+        exec = serving.exec_run(cmd=['tensorflow_model_server',
+                                     '--port=9000',
+                                     '--model_base_path=%s' % os.path.join('/serving/', self.model_type),
+                                     '&>',
+                                     '%s_%s.log' % (self.model_type, str(self.number)),
+                                     '&'],
+                                socket=False,
+                                stdout=True,
+                                stream=True)
+        for s in exec[1]:
+            _logger.debug(s)
 
-        # docker exec -it tf_serving /serving/bazel-bin/tensorflow_serving/model_servers/tensorflow_model_server \
-        #                 --port=9000 --model_base_path=/serving/ &> gan_log &
