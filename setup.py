@@ -9,37 +9,65 @@
 """
 
 import sys
+import os
 from setuptools import setup, find_packages
 
 # Add here console scripts and other entry points in ini-style format
-entry_points = """
-[console_scripts]
-# script_name = kafka_tfrx.module:function
-# For example:
-# fibonacci = kafka_tfrx.skeleton:run
-"""
 
 
 def setup_package():
-    setup(entry_points=entry_points,
-          version='0.2.1',
+    setup(version='0.2.2',
+          include_package_data=True,
           install_requires=[
               'confluent-kafka==0.11.4',
+              'avro-python3',
               'rx==1.6.1',
               'tweepy',
               'ws4py',
               'praw',
+              'scipy',
               'pandas',
-              'git+git://github.com/Supervisor/supervisor',
-              'git+git://github.com/danpaquin/gdax-python',
               'nltk',
               'tweet-preprocessor==0.5.0',
-              'tensorflow',
+              'tensorflow-gpu',
               'scikit-learn',
               'sortedcontainers',
-              'kafka-tfrx'],
+              'kafka-tfrx',
+              'Flask==0.12.2',
+              'flask-restplus==0.10.1',
+              'flask-socketio',
+              'flask-cors',
+              'kafka-tfrx',
+              'rx'],
+          keywords=[
+              'kryptoflow',
+              'tensorFlow',
+              'deep-learning',
+              'machine-learning',
+              'data-science',
+              'bitcoin',
+              'kafka',
+              'time-series'
+          ],
+          entry_points={"console_scripts": [
+                  "kryptoflow = kryptoflow.main:cli",
+              ],
+          },
+          classifiers=[
+              'Programming Language :: Python',
+              'Operating System :: OS Independent',
+              'Intended Audience :: Developers',
+              'Intended Audience :: Science/Research',
+              'Topic :: Scientific/Engineering :: Artificial Intelligence'
+          ],
+          dependency_links=['git+git://github.com/Supervisor/supervisor.git@4.0.0.dev0#egg=supervisor4.0.0.dev0',
+                            'git+git://github.com/danpaquin/gdax-python.git@1.0.6#egg=gdax-1.0.6'],
+
           tests_require=['pytest', 'pytest-cov', 'pytest-runner'],
-          packages=find_packages())
+          packages=find_packages(),
+          # data_files=[os.path.join('kryptoflow/docker/', i) for i in os.listdir('kryptoflow/docker')]
+
+          )
 
 
 if __name__ == "__main__":
