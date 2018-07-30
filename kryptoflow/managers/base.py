@@ -11,7 +11,9 @@ _logger = logging.getLogger('root')
 
 
 class BaseConfigManager(object):
-    """Base class for managing a configuration file."""
+    """Base class for managing a configuration file.
+        Based on the amazing github.com/polyaxon/polyaxon config manager setup
+    """
 
     IS_GLOBAL = False
     KRYPTOFLOW_DIR = None
