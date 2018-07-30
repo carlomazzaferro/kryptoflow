@@ -1,0 +1,47 @@
+INIT_FILE = 'polyaxonfile.yml'
+
+INIT_FILE_MODEL_TEMPLATE = """---
+version: 1
+
+kind: experiment
+
+logging:
+  level: INFO
+
+model:
+  # set you model
+  
+"""
+
+INIT_SECRETS_FILE = """
+reddit:
+  client_id": "XXXXXXXXXX"
+  client_secret: "XXXXXXXXXX"
+  username: "reddit_user_name"
+  password: "reddit_password"
+  user_agent: "testscript by /u/reddit_user_name"
+
+twitter:
+  consumer_key": "XXXXXXXXXX"
+  consumer_secret": "XXXXXXXXXX"
+  access_token": "XXXXXXXXXX"
+  access_secret": "XXXXXXXXXX"
+
+gdax:
+  API_key: "XXXXXXXXXX"
+  API_secret: "XXXXXXXXXXXX"
+  passphrase: "XXXXXXXX"
+"""
+
+TEMPLATE_PROJECT_FILES = [
+    'template/.gitignore',
+    'template/docker-compose.yaml',
+    'template/Dockerfile',
+    'template/Dockerfile.tfserving',
+    'template/secrets.yaml',
+    'template/model.py',
+    'template/kafka/count_messages.sh',
+    'template/kafka/set_topics_config.sh',
+    'template/kafka/server.properties',
+    'template/kafka/logs/.gitkeep'
+]
