@@ -1,0 +1,5 @@
+kind: experiment
+logging:
+  level: INFO
+name: test-project
+version: 1
