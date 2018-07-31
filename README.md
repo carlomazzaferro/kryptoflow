@@ -3,13 +3,15 @@ Kryptoflow
 
 [![Join the chat at https://gitter.im/kryptoflow-repo/Lobby](https://badges.gitter.im/kryptoflow-repo/Lobby.svg)](https://gitter.im/kryptoflow-repo/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/carlomazzaferro/kryptoflow.svg?branch=master)](https://travis-ci.org/carlomazzaferro/kryptoflow)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/16f53461ce4740899363141d52483e7f)](https://www.codacy.com/project/carlomazzaferro/kryptoflow-serving/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kryptoflow/kryptoflow-serving&amp;utm_campaign=Badge_Grade_Dashboard)
 
 
 Algorithmic crypto trading framework with Kafka and TensorFlow ([Keras](https://keras.io/) + [TensorFlow Serving](https://www.tensorflow.org/serving/))
 
 Documentation live at: https://carlomazzaferro.github.io/kryptoflow/index.html
 
-**STATUS**: pre-alpha. Very active development.
+**STATUS**: pre-alpha. Very active development. Feel free to rip the code apart, repurpose it, improve on it, or
+do whatever else it may please. Documentation is also not fully up to date. This will change soon.
 
 Description
 ===========
@@ -20,12 +22,36 @@ Implemented so far:
 2. Data transforms to model gdax (BTC-USD only for now) into time-series of custom timespan to which RNNs/LSTMs can be applied for time-series prediction
 3. Tensorflow training and model persistance
 4. Tensorflow Serving APIs exposed through a Flask endpoint. A few details are worth mentioning here. The Tensorflow Serving is actually run within a docker container, and that docker container is polled by a Flask endpoint through gRPC.
+5. CLI for initilizing new project, training model, and deploying it with tensorflow serving in Docker
 
-Installation and Infrastructure
-===============================
-## Infrastructure: kafka, tensorflow, et. al.
+Installation and Requirements
+=============================
 
-Spin up kafka and related scrapers (zookeeper, kafka-ui, etc.)
+Some basic requirements:
+
+1. python3.6 (recommend installing with homebrew)
+2. librdkafka: `brew install librdkafka`
+3. Python requirements: `pip install -r requirements.txt`
+4. NLTK requirements: `python3.6 -c "import nltk; nltk.download('vader_lexicon'); nltk.download('punkt')"`
+5. Kafka IP: `export KAFKA_SERVER_IP='kafka1'`
+
+Docker is also required.
+
+Then: `pip install kryptoflow`
+
+
+Creating a New Project
+======================
+
+`kryptoflow init --name make-money --path /home/user/projects`
+
+This will create all the configuration necessary to get going, alongside docker files and other stuff. Cd into the 
+repo and check out its contents. 
+
+Spinning Up Resources
+=====================
+
+From the project directory, run:
 
 ```bash
 docker-compose up
@@ -35,16 +61,8 @@ docker-compose up
 
 First, create a new virtual environment. This is highly recommended for managing dependencies.
 
-Then, modify the `resources/resources.json` file, and add your twitter and reddit API keys. This will enable you to programmatically access the twitter and Reddit APIs.
+Then, modify the `secrets.yaml` file, and add your twitter and reddit API keys. This will enable you to programmatically access the twitter and Reddit APIs.
 
-### Dependencies
-
-1. python3.6 (recommend installing with homebrew)
-2. librdkafka: `brew install librdkafka`
-3. Python requirements: `pip install -r requirements.txt`
-4. NLTK requirements: `python3.6 -c "import nltk; nltk.download('vader_lexicon'); nltk.download('punkt')"`
-4. Local install: `pip install -e .`
-5. Kafka IP: `export KAFKA_SERVER_IP='kafka1'`
 
 Finally, you may need to edit your `/etc/hosts/` to be able to connect to kafka. Do so by running:
 
