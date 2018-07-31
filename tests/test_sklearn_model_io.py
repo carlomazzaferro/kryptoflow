@@ -17,15 +17,6 @@ __license__ = "GNU GPL v2"
 
 
 @pytest.fixture
-def cleanup():
-    for root, dirs, files in os.walk(SAVED_MODELS):
-        for f in files:
-            os.unlink(os.path.join(root, f))
-        for d in dirs:
-            shutil.rmtree(os.path.join(root, d))
-
-
-@pytest.fixture
 def sklearn_model():
     x, y = make_classification(n_features=2, n_redundant=0, n_informative=1, n_clusters_per_class=1)
     lr = LogisticRegression()
@@ -108,6 +99,7 @@ def test_trainable_model_from_file(sklearn_model):
 
 
 def test_trainable_model(sklearn_model):
+    assert isinstance(sklearn_model, BaseEstimator)
     trainable = TrainableModel(sklearn_model)
     assert isinstance(trainable.model, BaseEstimator)
     assert isinstance(trainable.serializer, SklearnModel)

@@ -8,8 +8,6 @@
     Learn more under: http://pyscaffold.org/
 """
 
-import sys
-import os
 from setuptools import setup, find_packages
 
 # Add here console scripts and other entry points in ini-style format
@@ -28,6 +26,9 @@ def setup_package():
               'scipy',
               'pandas',
               'nltk',
+              'joblib',
+              'keras',
+              'pyyaml',
               'tweet-preprocessor==0.5.0',
               'tensorflow-gpu',
               'scikit-learn',

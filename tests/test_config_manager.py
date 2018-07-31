@@ -27,11 +27,11 @@ def test_get_config_file_path():
     assert BaseConfigManager.get_value('key') is None
 
     BaseConfigManager.CONFIG_FILE_NAME = 'kryptoflow.yaml'
-    assert BaseConfigManager.is_initialized() is True
+    assert BaseConfigManager.is_initialized() is False
     assert os.path.dirname(BaseConfigManager.get_config_file_path()) == '.'
 
     BaseConfigManager.KRYPTOFLOW_DIR = 'tests/test-project'
-    assert BaseConfigManager.is_initialized()
+    assert BaseConfigManager.is_initialized() is True
     assert os.path.basename(BaseConfigManager.get_config_file_path()) == 'kryptoflow.yaml'
 
     with pytest.raises(AttributeError):
@@ -41,7 +41,7 @@ def test_get_config_file_path():
     assert BaseConfigManager.get_value('name') == 'test-project'
 
     BaseConfigManager.set_config(init=False)
-    assert os.path.isfile(BaseConfigManager.CONFIG_FILE_NAME)
+    assert os.path.isfile(os.path.join(BaseConfigManager.KRYPTOFLOW_DIR, BaseConfigManager.CONFIG_FILE_NAME))
     assert 'name' in BaseConfigManager.CONFIG.keys()
     assert 'test-project' == BaseConfigManager.CONFIG['name']
 

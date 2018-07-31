@@ -20,15 +20,6 @@ __copyright__ = "Carlo Mazzaferro"
 __license__ = "GNU GPL v2"
 
 
-# @pytest.fixture
-# def cleanup():
-#     for root, dirs, files in os.walk(SAVED_MODELS):
-#         for f in files:
-#             os.unlink(os.path.join(root, f))
-#         for d in dirs:
-#             shutil.rmtree(os.path.join(root, d))
-
-
 @pytest.fixture(scope='function')
 def keras_model():
     x, y = make_classification(n_features=2, n_redundant=0, n_informative=1, n_clusters_per_class=1)
