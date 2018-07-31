@@ -2,4 +2,5 @@ kind: experiment
 logging:
   level: INFO
 name: test-project
+saved-models: tests/test-project/serialized
 version: 1

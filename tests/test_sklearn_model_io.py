@@ -7,13 +7,22 @@ import os
 import pytest
 from sklearn.datasets import make_classification
 from kryptoflow.models.model import SklearnModel, TrainableModel
+from kryptoflow.managers.project import ProjectManager
 import shutil
-from kryptoflow.definitions import SAVED_MODELS
+# from kryptoflow.definitions import SAVED_MODELS
 
 
 __author__ = "Carlo Mazzaferro"
 __copyright__ = "Carlo Mazzaferro"
 __license__ = "GNU GPL v2"
+
+
+@pytest.fixture
+def project_manager():
+    p = ProjectManager()
+    p.set_path('tests/test-project')
+    p.set_config(init=False)
+    return p
 
 
 @pytest.fixture
@@ -30,7 +39,7 @@ def serializer():
     skl.store(name='clf')
 
 
-def test_serialization(sklearn_model):
+def test_serialization(sklearn_model, project_manager):
     skl = SklearnModel(artifact=sklearn_model)
     skl.store(name='clf')
     assert os.path.exists(os.path.join(skl.model_path, 'clf' + '.mdl'))
@@ -38,14 +47,17 @@ def test_serialization(sklearn_model):
     assert os.path.exists(os.path.join(skl.model_path, 'clf2' + '.mdl'))
 
     # cleanup
-    for root, dirs, files in os.walk(SAVED_MODELS):
+    for root, dirs, files in os.walk(project_manager.CONFIG['saved-models']):
         for f in files:
             os.unlink(os.path.join(root, f))
         for d in dirs:
             shutil.rmtree(os.path.join(root, d))
 
+    with open(os.path.join(project_manager.CONFIG['saved-models'], '.gitkeep'), 'w') as gitkeep:
+        gitkeep.write('empty')
 
-def test_mulitple_serializations(sklearn_model):
+
+def test_mulitple_serializations(sklearn_model, project_manager):
     skl1 = SklearnModel(artifact=sklearn_model)
     skl1.store(name='clf1')
     assert os.path.exists(skl1.model_path)
@@ -55,17 +67,20 @@ def test_mulitple_serializations(sklearn_model):
 
     skl3 = SklearnModel(artifact=sklearn_model)
     skl3.store(name='clf2')
-    assert len(os.listdir(SAVED_MODELS)) == 3
+    assert len(os.listdir(project_manager.CONFIG['saved-models'])) == 3 + 1  # .gitkeep
 
     # cleanup
-    for root, dirs, files in os.walk(SAVED_MODELS):
+    for root, dirs, files in os.walk(project_manager.CONFIG['saved-models']):
         for f in files:
             os.unlink(os.path.join(root, f))
         for d in dirs:
             shutil.rmtree(os.path.join(root, d))
 
+    with open(os.path.join(project_manager.CONFIG['saved-models'], '.gitkeep'), 'w') as gitkeep:
+        gitkeep.write('empty')
 
-def test_loader(sklearn_model):
+
+def test_loader(sklearn_model, project_manager):
     skl = SklearnModel(artifact=sklearn_model)
     skl.store(name='clf')
     reloaded = skl.load(name='clf')
@@ -76,14 +91,17 @@ def test_loader(sklearn_model):
     reload_first = skl.load(run_number=1, name='clf')
     assert isinstance(reload_first, BaseEstimator)
 
-    for root, dirs, files in os.walk(SAVED_MODELS):
+    for root, dirs, files in os.walk(project_manager.CONFIG['saved-models']):
         for f in files:
             os.unlink(os.path.join(root, f))
         for d in dirs:
             shutil.rmtree(os.path.join(root, d))
 
+    with open(os.path.join(project_manager.CONFIG['saved-models'], '.gitkeep'), 'w') as gitkeep:
+        gitkeep.write('empty')
 
-def test_trainable_model_from_file(sklearn_model):
+
+def test_trainable_model_from_file(sklearn_model, project_manager):
     skl = SklearnModel(artifact=sklearn_model)
     # lr = LogisticRegression()
     # trainable = TrainableModel(artifact=lr)
@@ -91,11 +109,14 @@ def test_trainable_model_from_file(sklearn_model):
     skl.store(name='clf')
     trainable = TrainableModel.from_file(run_number=1, name='clf', model_type='sklearn')
     assert isinstance(trainable.model, BaseEstimator)
-    for root, dirs, files in os.walk(SAVED_MODELS):
+    for root, dirs, files in os.walk(project_manager.CONFIG['saved-models']):
         for f in files:
             os.unlink(os.path.join(root, f))
         for d in dirs:
             shutil.rmtree(os.path.join(root, d))
+
+    with open(os.path.join(project_manager.CONFIG['saved-models'], '.gitkeep'), 'w') as gitkeep:
+        gitkeep.write('empty')
 
 
 def test_trainable_model(sklearn_model):

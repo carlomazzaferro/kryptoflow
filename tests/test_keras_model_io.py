@@ -12,7 +12,7 @@ from keras.utils.test_utils import keras_test
 from keras.layers import Dense, Activation
 from kryptoflow.models.model import KerasModel, TrainableModel
 import shutil
-from kryptoflow.definitions import SAVED_MODELS
+from kryptoflow.managers.project import ProjectManager
 
 
 __author__ = "Carlo Mazzaferro"
@@ -34,13 +34,21 @@ def keras_model():
 
 
 @pytest.fixture
+def project_manager():
+    p = ProjectManager()
+    p.set_path('tests/test-project')
+    p.set_config(init=False)
+    return p
+
+
+@pytest.fixture
 def serializer():
     skl = KerasModel(artifact=keras_model)
     skl.store(name='nn')
 
 
 @keras_test
-def test_serialization(keras_model):
+def test_serialization(keras_model, project_manager):
     skl = KerasModel(artifact=keras_model)
     skl.store(name='nn')
     assert os.path.exists(os.path.join(skl.model_path, 'nn' + '.h5'))
@@ -48,11 +56,14 @@ def test_serialization(keras_model):
     assert os.path.exists(os.path.join(skl.model_path, 'tf', 'saved_model' + '.pb'))
     assert os.path.isdir(os.path.join(skl.model_path, 'tf', 'variables'))
 
-    for root, dirs, files in os.walk(SAVED_MODELS):
+    for root, dirs, files in os.walk(project_manager.CONFIG['saved-models']):
         for f in files:
             os.unlink(os.path.join(root, f))
         for d in dirs:
             shutil.rmtree(os.path.join(root, d))
+
+    with open(os.path.join(project_manager.CONFIG['saved-models'], '.gitkeep'), 'w') as gitkeep:
+        gitkeep.write('empty')
 
 
 @keras_test
@@ -70,56 +81,68 @@ def test_mulitple_serializations_second(keras_model):
 
 
 @keras_test
-def test_mulitple_serializations_third(keras_model):
+def test_mulitple_serializations_third(keras_model, project_manager):
     skl3 = KerasModel(artifact=keras_model)
     skl3.store(name='nn3')
-    assert len(os.listdir(SAVED_MODELS)) == 3
+    assert len(os.listdir(project_manager.CONFIG['saved-models'])) == 3 + 1  # .gitkeep
 
     # cleanup
-    for root, dirs, files in os.walk(SAVED_MODELS):
+    for root, dirs, files in os.walk(project_manager.CONFIG['saved-models']):
         for f in files:
             os.unlink(os.path.join(root, f))
         for d in dirs:
             shutil.rmtree(os.path.join(root, d))
 
+    with open(os.path.join(project_manager.CONFIG['saved-models'], '.gitkeep'), 'w') as gitkeep:
+        gitkeep.write('empty')
+
 
 @keras_test
-def test_loader(keras_model):
+def test_loader(keras_model, project_manager):
     skl = KerasModel(artifact=keras_model)
     skl.store(name='nn')
     K.clear_session()
     reloaded = skl.load(name='nn')
     assert isinstance(reloaded, KerasBaseModel)
 
-    for root, dirs, files in os.walk(SAVED_MODELS):
+    for root, dirs, files in os.walk(project_manager.CONFIG['saved-models']):
         for f in files:
             os.unlink(os.path.join(root, f))
         for d in dirs:
             shutil.rmtree(os.path.join(root, d))
 
+    with open(os.path.join(project_manager.CONFIG['saved-models'], '.gitkeep'), 'w') as gitkeep:
+        gitkeep.write('empty')
+
 
 @keras_test
-def test_trainable_model_from_file(keras_model):
+def test_trainable_model_from_file(keras_model, project_manager):
     skl = KerasModel(artifact=keras_model)
     skl.store(name='nn')
 
     K.clear_session()
     trainable = TrainableModel.from_file(run_number=1, name='nn', model_type='keras')
     assert isinstance(trainable.model, KerasBaseModel)
-    for root, dirs, files in os.walk(SAVED_MODELS):
+    for root, dirs, files in os.walk(project_manager.CONFIG['saved-models']):
         for f in files:
             os.unlink(os.path.join(root, f))
         for d in dirs:
             shutil.rmtree(os.path.join(root, d))
+
+    with open(os.path.join(project_manager.CONFIG['saved-models'], '.gitkeep'), 'w') as gitkeep:
+        gitkeep.write('empty')
 
 
 @keras_test
-def test_trainable_model(keras_model):
+def test_trainable_model(keras_model, project_manager):
     trainable = TrainableModel(keras_model)
     assert isinstance(trainable.model, KerasBaseModel)
     assert isinstance(trainable.serializer, KerasModel)
-    for root, dirs, files in os.walk(SAVED_MODELS):
+    for root, dirs, files in os.walk(project_manager.CONFIG['saved-models']):
         for f in files:
             os.unlink(os.path.join(root, f))
         for d in dirs:
             shutil.rmtree(os.path.join(root, d))
+
+    with open(os.path.join(project_manager.CONFIG['saved-models'], '.gitkeep'), 'w') as gitkeep:
+        gitkeep.write('empty')
