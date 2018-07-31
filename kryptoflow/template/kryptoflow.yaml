@@ -5,3 +5,4 @@ kind: experiment
 logging:
   level: INFO
 
+saved-models: 'serialized'

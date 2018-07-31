@@ -10,6 +10,10 @@ class ModelNameTypeError(Exception):
     pass
 
 
+class NotInitilizedError(Exception):
+    pass
+
+
 def check_model_type(model_type=None, model=None):
     from kryptoflow.models.model import KerasBaseModel
     if not model:
