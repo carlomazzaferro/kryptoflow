@@ -1,12 +1,11 @@
-import abc
 import os
 import joblib
 import subprocess
 from kryptoflow.common.validation import check_model_type
-from kryptoflow.definitions import SAVED_MODELS
+from kryptoflow.managers.project import ProjectManager
 import logging
 import docker
-from typing import Type, Union
+from typing import Union
 from sklearn.base import BaseEstimator
 from keras.engine.training import Model as KerasBaseModel
 from keras import backend as K
@@ -20,7 +19,9 @@ _logger = logging.getLogger('root')
 class Model(object):
 
     def __init__(self, model_type='sklearn'):
-        existing_models = sorted([int(i) for i in os.listdir(SAVED_MODELS)])
+        print(ProjectManager.get_config())
+        existing_models = ProjectManager.get_models()
+        print(existing_models)
         if not existing_models:
             self._number = 1
         else:
@@ -41,7 +42,7 @@ class Model(object):
 
     @property
     def model_path(self):
-        return os.path.join(SAVED_MODELS, str(self.number), self.model_type)
+        return os.path.join(ProjectManager.get_value('saved-models'), str(self.number), self.model_type)
 
 
 class SklearnModel(Model):
@@ -115,9 +116,7 @@ class KerasModel(Model):
     def _store_tf(self, name, session):
 
         json_model_file = open(os.path.join(self.model_path, name + '.json'), "r").read()
-
         loaded_model = model_from_json(json_model_file)
-
         loaded_model.load_weights(os.path.join(self.model_path, name + '.h5'))
 
         builder = saved_model_builder.SavedModelBuilder(os.path.join(self.model_path, 'tf'))
@@ -136,7 +135,7 @@ class TrainableModel(object):
 
     def __init__(self, artifact: Union[KerasBaseModel, BaseEstimator]):
         self.model = artifact
-        self.model_type = check_model_type(self.model)
+        self.model_type = check_model_type(model=self.model)
         self.serializer = {'sklearn': SklearnModel(), 'keras': KerasModel()}[self.model_type]
 
     def train(self, x_train, y_train):
@@ -170,15 +169,15 @@ class ServableModel(Model):
     def serve(self):
         client = docker.from_env()
         serving = client.containers.get('tf-serving')
-        exec = serving.exec_run(cmd=['tensorflow_model_server',
-                                     '--port=9000',
-                                     '--model_base_path=%s' % os.path.join('/serving/', self.model_type),
-                                     '&>',
-                                     '%s_%s.log' % (self.model_type, str(self.number)),
-                                     '&'],
-                                socket=False,
-                                stdout=True,
-                                stream=True)
-        for s in exec[1]:
+        execute = serving.exec_run(cmd=['tensorflow_model_server',
+                                        '--port=9000',
+                                        '--model_base_path=%s' % os.path.join('/serving/', self.model_type),
+                                        '&>',
+                                        '%s_%s.log' % (self.model_type, str(self.number)),
+                                        '&'],
+                                   socket=False,
+                                   stdout=True,
+                                   stream=True)
+        for s in execute[1]:
             _logger.debug(s)
 
