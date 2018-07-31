@@ -1,3 +1,4 @@
+import subprocess
 import os
 from kryptoflow import definitions
 import click

@@ -14,7 +14,7 @@ from setuptools import setup, find_packages
 
 
 def setup_package():
-    setup(version='0.2.2',
+    setup(version='0.3.0',
           include_package_data=True,
           install_requires=[
               'confluent-kafka==0.11.4',
