@@ -1,15 +1,33 @@
 import json
 import math
+import sys
 from kryptoflow.definitions import CONFIG_PATH
 from datetime import datetime, time
 import time as t
 from threading import Timer
 from kryptoflow.definitions import TIMEFRAME
+import logging
+
+
+_logger = logging.getLogger(__name__)
 
 
 def load_conf():
     with open(CONFIG_PATH, 'r') as inf:
         return json.load(inf)
+
+
+def setup_logging(loglevel):
+    """Setup basic logging
+
+    Args:
+      loglevel (int): minimum loglevel for emitting messages
+    """
+    level = logging.DEBUG if loglevel else logging.INFO
+
+    logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
+    logging.basicConfig(level=level, stream=sys.stdout,
+                        format=logformat, datefmt="%Y-%m-%d %H:%M:%S")
 
 
 class TimeUtils(object):
