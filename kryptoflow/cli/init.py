@@ -1,7 +1,5 @@
-import subprocess
 import os
 from kryptoflow.managers.project import ProjectManager
-from kryptoflow import definitions
 import click
 import logging
 import shutil
