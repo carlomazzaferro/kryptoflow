@@ -3,7 +3,6 @@ from __future__ import absolute_import, division, print_function
 
 import yaml
 import pkgutil
-import json
 import os
 import logging
 
@@ -60,6 +59,7 @@ class BaseConfigManager(object):
 
         with open(config_file_path, "w") as config_file:
             cls.CONFIG = yaml.load(pkgutil.get_data('kryptoflow', 'template/kryptoflow.yaml'))
+            cls.CONFIG['saved-models'] = os.path.join(cls.KRYPTOFLOW_DIR, cls.CONFIG['saved-models'])
             cls.CONFIG.update({'name': os.path.basename(cls.KRYPTOFLOW_DIR)})
             yaml.dump(cls.CONFIG, config_file, default_flow_style=False)
 
