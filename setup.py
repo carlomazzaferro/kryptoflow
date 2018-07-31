@@ -65,7 +65,7 @@ def setup_package():
           dependency_links=['git+git://github.com/Supervisor/supervisor.git@4.0.0.dev0#egg=supervisor4.0.0.dev0',
                             'git+git://github.com/danpaquin/gdax-python.git@1.0.6#egg=gdax-1.0.6'],
 
-          tests_require=['pytest', 'pytest-cov', 'pytest-runner'],
+          tests_require=['pytest', 'pytest-cov', 'pytest-runner', 'python-coveralls'],
           packages=find_packages(),
           # data_files=[os.path.join('kryptoflow/docker/', i) for i in os.listdir('kryptoflow/docker')]
 

@@ -15,6 +15,8 @@ install:
 - pip install tox-travis
 script:
 - tox
+after_script:
+- coveralls
 deploy:
   provider: pypi
   user: mazzafish

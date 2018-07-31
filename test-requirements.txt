@@ -16,3 +16,4 @@ kafka-tfrx
 pytest
 pytest-cov
 pytest-runner
+python-coveralls
