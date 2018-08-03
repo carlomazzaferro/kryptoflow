@@ -56,6 +56,11 @@
                                 Installation
                             </a>
                         </li>
+                                            <li class="">
+                            <a href="https://carlomazzaferro.github.io/kryptoflow/quickstart.html">
+                                Quickstart
+                            </a>
+                        </li>
                                     </ul>
                             <p class="text-muted">
                     Guide
@@ -116,27 +121,33 @@
             </a>
         </header>
         <div class="container">
-                            <h1 id="installation-and-infrastructure">Installation and Infrastructure</h1>
-<p>First, clone the repo: <code>git clone https://github.com/carlomazzaferro/krytptoflow.git</code> and
-navigate to its root path.</p>
+                            <h1 id="installation">Installation</h1>
+<p>Virtualenvs are always encouraged. I recommend <a href="https://virtualenvwrapper.readthedocs.io/en/latest/index.html">virtualenvwrapper</a>
+with python 3.6. Python 3.5 is also supported.</p>
+<pre><code class="language-bash">$ mkvirtualenv kryptoflow
+$ workon kryptoflow</code></pre>
+<p>Proceed with the installation</p>
+<pre><code class="language-bash">$ pip install kryptoflow</code></pre>
+<p>NOTE: you may need some additional dependencies. Namely, <code>librdkafka</code>:</p>
+<p>On mac, with <a href="https://brew.sh/">homebrew</a>:</p>
+<pre><code class="language-bash">$ brew install librdkafka</code></pre>
+<p>On linux, with apt: </p>
+<pre><code class="language-bash">$ wget -qO - 'https://packages.confluent.io/deb/4.0/archive.key' | apt-key add - 
+$ add-apt-repository "deb [arch=amd64] https://packages.confluent.io/deb/4.0 stable main" 
+$ apt-get install -y librdkafka-dev librdkafka1</code></pre>
+<p>Optionally, you may need NLTK for processing tweets and reddit comments/posts. You may do so by
+downloading a couple of datasets with <a href="https://www.nltk.org/">NLTK</a> (which will be installed with kryptoflow):</p>
+<pre><code class="language-bash">$ python3 -c "import nltk; nltk.download('vader_lexicon'); nltk.download('punkt')"</code></pre>
 <h3 id="kafka-tensorflow-et-al">Kafka, TensorFlow, et. al.</h3>
-<p>Spin up kafka and related scrapers (zookeeper, kafka-ui, etc.)</p>
-<pre><code class="language-bash">docker-compose up</code></pre>
-<h3 id="dependencies">Dependencies</h3>
-<p>Ideally, create a new virtual environment. This is highly recommended for managing dependencies.</p>
-<ol>
-<li>python3.6 (recommend installing with homebrew)</li>
-<li>librdkafka: <code>brew install librdkafka</code></li>
-<li>Python requirements: <code>pip install -r requirements.txt</code></li>
-<li>NLTK requirements: <code>python3.6 -c "import nltk; nltk.download('vader_lexicon'); nltk.download('punkt')"</code></li>
-<li>Local install: <code>pip install -e .</code></li>
-<li>Kafka IP: <code>export KAFKA_SERVER_IP='kafka1'</code></li>
-</ol>
-<p>Finally, you may need to edit your <code>/etc/hosts/</code> to be able to connect to kafka. Do so by running:</p>
+<p>The default installation will install vanilla tensorflow. For installing tensorflow with GPU support,
+visit the OS-specific installation guide on <a href="https://www.tensorflow.org/install/">tensorflow's website</a></p>
+<p>Kafka's set up is pretty much dealt with automatically. If you're running Kafka locally (which is currently
+the only supported way), you may need to do one more tweak:</p>
+<p>Edit your <code>/etc/hosts</code> file by running:</p>
 <pre><code class="language-bash">sudo nano /etc/hosts</code></pre>
 <p>and adding the following line to it:</p>
 <pre><code class="language-bash">127.0.0.1  localhost kafka1</code></pre>
-<p>This should be enough to have all the dependencies installed and the system up and running.</p>
+<p>That's it! Head over to the <a href="quickstart.html">quick start</a> to get to work.</p>
                     </div>
     </div>
 

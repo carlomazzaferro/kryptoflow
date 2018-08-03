@@ -121,13 +121,49 @@
             </a>
         </header>
         <div class="container">
-                            <h1 id="configuration">Configuration</h1>
-<h3 id="data-collection-amp-trading">Data collection &amp; Trading</h3>
-<p>Modify the <code>secrets.yaml</code> file, and add your twitter, reddit, and GDAX API keys.
-This will enable you to programmatically access the twitter and Reddit APIs. Also add your
-gdax key, secret, and pass phrase for automated trading. Goes without saying that you should
-be very careful with these, and only start live trading when you are sure you won't be losing
-money.</p>
+                            <h3 id="create-a-new-project">Create a new project</h3>
+<p>Kryptoflow comes with a handy cli tool that enables you to perform most of the work. First thing you'd want to
+do is create a new project. This assumes that kryptoflow is installed.</p>
+<pre><code class="language-bash">$ kryptoflow init --name 'test-project' --path '/home/user/projects'</code></pre>
+<p>The command will create a new projected located at <code>/home/user/projects/test-project</code>. The directory will look like this:</p>
+<pre><code class="language-bash">kafka/                          # Kafka logs, data and config files
+    logs/
+    count-messages.sh
+    server.properties
+    set_topics_config.sh
+serialized/                     # Directory where your serialized tf/sklearn/keras models are stored
+docker-compose.yaml             # Docker configuration for kafka and related services
+Dockerfile.tfserving            # Docker configuration for tensorflow serving
+kryptoflow.yaml                 # Project configuration
+model.py                        # Keras/tensorflow model
+secrets.yaml                    # API secrets for reddit, twitte, gdax</code></pre>
+<h3 id="kafka-tensorflow-serving">Kafka, TensorFlow Serving</h3>
+<p>To spin up the required resources, simply run:</p>
+<pre><code class="language-bash">docker-compose up</code></pre>
+<p>This may take some time if running for the first time, mainly because the TensorfFlow serving
+container is quite large. </p>
+<p>The docker compose file also includes a UI for your Kafka topics. Head to <a href="localhost:8000">localhost:8000</a> to check out Kafka's UI (provided by <a href="https://www.landoop.com/">Landoop</a>).</p>
+<h3 id="data-ingestion">Data Ingestion</h3>
+<p>Now you can start ingesting data and storing it to Kafka. (If you find yourself wondering why the hell we are
+using Kafka for this project, a few notes are available on the <a href="architecture.html">architecture</a> page).</p>
+<p>From your project root directory, you can simply run:</p>
+<pre><code class="language-bash">$ kryptoflow scrape --monitor</code></pre>
+<p>Obviously, it may take some time until you have enough data to do some meaningful work, but luckily
+kryptoflow has its own in-built mechanisms to ensure the data ingestion won't stop. We use <a href="https://github.com/Supervisor/supervisor">supervisor</a>
+alongside with a few failover mechanisms to ensure data is continuously ingested. </p>
+<p>To verify that your data is being ingested appropriatley, head to <a href="http://localhost:8000"><a href="http://localhost:8000">http://localhost:8000</a></a> for a visual ui of the Kafka
+topics being ingested.</p>
+<h3 id="model-training">Model Training</h3>
+<p>The file <code>model.py</code> contains a baseline TensorFlow model for you to start playing around with. </p>
+<pre><code class="language-bash">$ kryptoflow train --epocs 10 --model model.py</code></pre>
+<p>Will kickstart the training process. At the end of the training session, the model will be automatically
+serialized, and a version will be assigned to it. You can see all the version trained so far in
+the <code>/serialized</code> directory. </p>
+<h3 id="model-serving">Model Serving</h3>
+<pre><code class="language-bash">$ kryptoflow serve --model-number 1</code></pre>
+<p>This will place the serialized model inside the tensorflow serving container and expose a REST
+interface through which it can be called</p>
+<h2 id="to-be-continued">To be continued</h2>
                     </div>
     </div>
 

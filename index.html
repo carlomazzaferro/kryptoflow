@@ -56,6 +56,11 @@
                                 Installation
                             </a>
                         </li>
+                                            <li class="">
+                            <a href="https://carlomazzaferro.github.io/kryptoflow/quickstart.html">
+                                Quickstart
+                            </a>
+                        </li>
                                     </ul>
                             <p class="text-muted">
                     Guide
@@ -117,35 +122,53 @@
         </header>
         <div class="container">
                             <p><a href="https://gitter.im/kryptoflow-repo/Lobby?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img src="https://badges.gitter.im/kryptoflow-repo/Lobby.svg" alt="Join the chat at https://gitter.im/kryptoflow-repo/Lobby" /></a>
-<a href="https://travis-ci.org/carlomazzaferro/kryptoflow"><img src="https://travis-ci.org/carlomazzaferro/kryptoflow.svg?branch=master" alt="Build Status" /></a></p>
+<a href="https://travis-ci.org/carlomazzaferro/kryptoflow"><img src="https://travis-ci.org/carlomazzaferro/kryptoflow.svg?branch=master" alt="Build Status" /></a>
+<a href="https://www.codacy.com/project/carlomazzaferro/kryptoflow-serving/dashboard?utm_source=github.com&amp;amp;utm_medium=referral&amp;amp;utm_content=kryptoflow/kryptoflow-serving&amp;amp;utm_campaign=Badge_Grade_Dashboard"><img src="https://api.codacy.com/project/badge/Grade/16f53461ce4740899363141d52483e7f" alt="Codacy Badge" /></a></p>
 <p>An algorithmic crypto trading framework with Kafka and TensorFlow (<a href="https://keras.io/">Keras</a> + <a href="https://www.tensorflow.org/serving/">TensorFlow Serving</a>)</p>
 <h3 id="premise">Premise</h3>
-<p>The idea behind this project is to take care of the enormous boilerplating and infrastructural work
-that goes behind building a machine learning-driven trading systems. Being a very young project, it is
-still in experimental stages, and much work is left to be done. This is much closer to an early alpha
-than a working release, so proceed with caution!</p>
+<p>The idea behind this project is to take care of the infrastructural work
+that goes behind building a machine learning-driven trading systems. In particular, the aim is giving users
+a working set up for:</p>
+<ol>
+<li>Gathering as granular data as possible </li>
+<li>Test a variety of strategies intuitively and with low friction</li>
+<li>Deploying models easily and keeping them up to date</li>
+<li>Trading continuously and reliably</li>
+</ol>
+<p>All this done through a rich API and a browser-based GUI. Want to test your newly developed deep learning model
+on the wild crypto markets without having to do anything other than write the model itself? Then this is the
+place to start. </p>
+<p>Another use case: want to build something like Quantopian but using cutting-edge machine learning? Then you
+may need to build it yourself. Here you'll find most of the tooling needed. </p>
+<p>DISCLAIMER: Still in experimental stages, and much work is left to be done.
+This is much closer to an early alpha than a working release, so proceed with caution! </p>
 <h3 id="current-state-amp-future-goals">Current State &amp; Future Goals</h3>
 <p>Implemented so far:</p>
 <ol>
-<li>Data ingestion pipeline, which includes websocket streams from twitter, reddit, gdax which are saved to three separate Kafka topics.</li>
-<li>Data transforms to model gdax (BTC-USD only for now) into time-series of custom timespan to which RNNs/LSTMs can be applied for time-series prediction</li>
+<li>Data ingestion pipeline, which includes websocket streams from twitter, reddit, gdax which are saved to three
+separate Kafka topics.</li>
+<li>Data transforms to model gdax (BTC-USD only for now) into time-series of custom timespan to which RNNs/LSTMs can
+be applied for time-series prediction</li>
 <li>Tensorflow training and model persistance</li>
-<li>Tensorflow Serving APIs exposed through a Flask endpoint. A few details are worth mentioning here. The Tensorflow Serving is actually run within a docker container, and that docker container is polled by a Flask endpoint through gRPC.</li>
+<li>Tensorflow Serving APIs exposed through a Flask endpoint. A few details are worth mentioning here.
+The Tensorflow Serving is actually run within a docker container, and that docker container is polled by a Flask endpoint through gRPC.</li>
+<li>CLI interface, which enables </li>
 </ol>
 <p>Todo:</p>
 <ol>
 <li>Trading system </li>
 <li>Webapp functionality, namely:
-a. Twitter/Reddit sentiment (maybe add a Word Cloud?)
+a. Twitter/Reddit sentiment
 b. Predictions (live and historical)
-c. Management console: kickstart retrai/deploy new model, post to GDAX
+c. Management console: kickstart retrain/deploy new model, post to GDAX
 d. Visualization of model performance
 e. Predicted gain/loss</li>
-<li>Continuous training and deployment of models</li>
-<li>Road map to deploying the system in a production environment</li>
 </ol>
 <h3 id="architecture">Architecture</h3>
 <p>To get a sense of how the project is set up, visit <a href="architecture.html">architecture</a></p>
+<h3 id="get-started">Get Started</h3>
+<p>To get going, check out the <a href="quickstart.html">quickstart</a> tutorial.</p>
+<p>To set up and install all dependencies, go to <a href="installation.html">installation requirements and setup</a></p>
                     </div>
     </div>
 
