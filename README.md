@@ -16,34 +16,45 @@ do whatever else it may please. Documentation is also not fully up to date. This
 Description
 ===========
 
-Implemented so far:
+The idea behind this project is to take care of the infrastructural work
+that goes behind building a machine learning-driven trading systems. In particular, the aim is giving users
+a working set up for:
 
-1. Data ingestion pipeline, which includes websocket streams from twitter, reddit, gdax which are saved to three separate Kafka topics.
-2. Data transforms to model gdax (BTC-USD only for now) into time-series of custom timespan to which RNNs/LSTMs can be applied for time-series prediction
-3. Tensorflow training and model persistance
-4. Tensorflow Serving APIs exposed through a Flask endpoint. A few details are worth mentioning here. The Tensorflow Serving is actually run within a docker container, and that docker container is polled by a Flask endpoint through gRPC.
-5. CLI for initilizing new project, training model, and deploying it with tensorflow serving in Docker
+1. Gathering as granular data as possible 
+2. Test a variety of strategies intuitively and with low friction
+3. Deploying models easily and keeping them up to date
+4. Trading continuously and reliably
+
+
+All this done through a rich API and a browser-based GUI. Want to test your newly developed deep learning model 
+on the wild crypto markets without having to do anything other than write the model itself? Then this is the 
+place to start. 
+
+Another use case: want to build something like Quantopian but using cutting-edge machine learning? Then you
+may need to build it yourself. Here you'll find most of the tooling needed. 
+
 
 Installation and Requirements
 =============================
 
 Some basic requirements:
 
-1. python3.6 (recommend installing with homebrew)
-2. librdkafka: `brew install librdkafka`
-3. Python requirements: `pip install -r requirements.txt`
-4. NLTK requirements: `python3.6 -c "import nltk; nltk.download('vader_lexicon'); nltk.download('punkt')"`
-5. Kafka IP: `export KAFKA_SERVER_IP='kafka1'`
+1. python3.6 
+2. Docker 
 
-Docker is also required.
+More at: https://carlomazzaferro.github.io/kryptoflow/installation.html
 
-Then: `pip install kryptoflow`
+```bash
+$ pip install kryptoflow
+```
 
 
 Creating a New Project
 ======================
 
-`kryptoflow init --name make-money --path /home/user/projects`
+```bash
+$ kryptoflow init --name make-money --path /home/user/projects
+```
 
 This will create all the configuration necessary to get going, alongside docker files and other stuff. Cd into the 
 repo and check out its contents. 
@@ -57,92 +68,22 @@ From the project directory, run:
 docker-compose up
 ```
 
-## Data collection, without Docker (MacOS, Ubuntu)
-
-First, create a new virtual environment. This is highly recommended for managing dependencies.
-
-Then, modify the `secrets.yaml` file, and add your twitter and reddit API keys. This will enable you to programmatically access the twitter and Reddit APIs.
-
-
-Finally, you may need to edit your `/etc/hosts/` to be able to connect to kafka. Do so by running:
-
-`sudo nano /etc/hosts`
-
-and adding the following line to it:
-
-`127.0.0.1       localhost kafka1`
-
-### Run scrapers
-
-Then, run `mkdir -p ~/tmp/logs/ && supervisord -c resources/supervisord.conf`
-
-This will run the three scripts below and will take care of restarting them if/when they fail. This should happen eventually due to API downtimes, malformatted data that is not handled, etc. Usually however the scripts are pretty resiliant and have run for weeks straight.
-
-Alternatively, run:
-
-`python3.6 kryptoflow/scrapers/reddit.py`
-
-`python3.6 kryptoflow/scrapers/gdax_ws.py`
-
-`python3.6 kryptoflow/scrapers/twitter.py`
-
-To verify that your data is being ingested appropriatley, head to [http://localhost:8000](http://localhost:8000) for a visual ui of the Kafka
-topics being ingested.
-
-## Webapp
-
-The scope of the project is creating a _framework_. As such, I found it tremendously useful (and a great learning
-experience) to add a visualization layer that would make it easy to visualize the collected data, as well as 
-the performance of the models. A bare-bones (note: still in development) ember.js can be accessed by running:
-
-`python -m kryptoflow.serving.app.py -vv`
-
-Then, head to  [http://localhost:5000](http://0.0.0.0:5000) and click on 'Charts'. To retrieve historical
-data, click on 'From Server'.
-
-This should show up: 
-
-![](resources/frontend.png)
-
-
-## API
-
-The backend was written in Flask. It provides restful access to historical data as well as access to the prediction
-service. The latter should work only if the steps outlined in the Analysis section have been followed. The api was 
-built with [Flask-RESTPLUS](http://flask-restplus.readthedocs.io/en/stable/), which offers automated documentation
-with swagger. 
-
-Head to [http://0.0.0.0:5000/tf_api/#!/historical_data](http://0.0.0.0:5000/tf_api/#!/historical_data) to check it out. 
-
-Preview:
-
-![](resources/api.png)
-
-##  Analysis
-Check out Keras [training notebook](https://github.com/carlomazzaferro/kryptoflow/blob/master/keras_training.ipynb)
-for training and model storing instructions
-
-## Deploy with Tensorflow Serving
-
-Build the docker container with bazel, tf serving, and all the required dependencies to
-serve the model. This may take some time (~40 minutes)
+Training and Deploying a Model
+==============================
 
 ```bash
-bash kryptoflow/serving/build_server.sh
+$ kryptoflow train --epocs 10 --model model.py
 ```
 
-Then, copy the stored models to the container:
+Then
 
 ```bash
-bash kryptoflow/serving/serve.sh 1
+$ kryptoflow serve --model-number 1
 ```
 
-The `1` indicates the number of the model. Check `saved_models/` directory for the available
-stored models. These are automatically saved when the class `kryptoflow.ml.export.ModelExporter` is
-instantiated. See the notebook for more info on how to stored the models themselves.
 
-
-## License
+License
+-------
 
 [GNU General Public License v3.0](https://choosealicense.com/licenses/gpl-3.0/)
 
