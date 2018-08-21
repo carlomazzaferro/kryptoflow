@@ -36,9 +36,10 @@ def test_get_config_file_path():
 
     with pytest.raises(AttributeError):
         BaseConfigManager.get_value('key')
-
+    
     assert isinstance(BaseConfigManager.get_config(), dict)
     assert BaseConfigManager.get_value('name') == 'test-project'
+    assert BaseConfigManager.get_value('logging') == {'level': 'INFO'}
 
     BaseConfigManager.set_config(init=False)
     assert os.path.isfile(os.path.join(BaseConfigManager.KRYPTOFLOW_DIR, BaseConfigManager.CONFIG_FILE_NAME))

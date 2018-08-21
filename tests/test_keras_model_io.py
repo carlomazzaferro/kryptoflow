@@ -3,13 +3,13 @@
 
 
 import os
+import six
 import pytest
 from sklearn.datasets import make_classification
-from keras.engine.training import Model as KerasBaseModel
-from keras import backend as K
-from keras.models import Sequential
-from keras.utils.test_utils import keras_test
-from keras.layers import Dense, Activation
+from tensorflow.keras import Model as KerasBaseModel
+from tensorflow.keras import backend as K
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation
 from kryptoflow.models.model import KerasModel, TrainableModel
 import shutil
 from kryptoflow.managers.project import ProjectManager
@@ -18,6 +18,21 @@ from kryptoflow.managers.project import ProjectManager
 __author__ = "Carlo Mazzaferro"
 __copyright__ = "Carlo Mazzaferro"
 __license__ = "GNU GPL v2"
+
+
+def keras_test(func):
+    """Function wrapper to clean up after TensorFlow tests.
+    # Arguments
+        func: test function to clean up after.
+    # Returns
+        A function wrapping the input function.
+    """
+    @six.wraps(func)
+    def wrapper(*args, **kwargs):
+        output = func(*args, **kwargs)
+        K.clear_session()
+        return output
+    return wrapper
 
 
 @pytest.fixture(scope='function')
