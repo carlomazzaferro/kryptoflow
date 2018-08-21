@@ -25,12 +25,16 @@ menu:
                 architecture:
                     text: Architecture
                     relativeUrl: architecture.html
+
         getting-started:
             name: Getting Started
             items:
                 installation:
                     text: Installation
                     relativeUrl: installation.html
+                quickstart:
+                    text: Quickstart
+                    relativeUrl: quickstart.html
 
         guide:
             name: Guide
