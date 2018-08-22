@@ -1,5 +1,6 @@
-from kryptoflow.models import conf
 from sklearn.base import BaseEstimator
+
+from kryptoflow.models import conf
 
 
 class ModelTypeError(Exception):
@@ -11,6 +12,10 @@ class ModelNameTypeError(Exception):
 
 
 class NotInitilizedError(Exception):
+    pass
+
+
+class ResourcedError(Exception):
     pass
 
 

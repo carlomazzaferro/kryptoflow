@@ -1,5 +1,4 @@
 from rx import Observable, Observer
-from kryptoflow.definitions import TIMEFRAME
 
 
 class BaseObserver(Observer):
@@ -27,20 +26,11 @@ class Streamer(BaseObserver):
         return value
 
 
-class Accumulator(BaseObserver):
-    """
-    >>> from kryptoflow.common.stream import KafkaStream
-    >>> stream = KafkaStream.consumer(topic='gdax', ip='45.55.53.47', offset='end')
-    >>> source = Observable.from_(stream)
+class Emitter(BaseObserver):
 
-    >>> source.subscribe(Accumulator())
-    """
-    ACCUMULATED = []
+    def __init__(self, ws):
+        self.ws = ws
+        super().__init__()
 
     def on_next(self, value):
-
-        self.ACCUMULATED.append(value)
-        if len(self.ACCUMULATED) >= TIMEFRAME:
-            cache = self.ACCUMULATED
-            self.ACCUMULATED = []
-            return cache
+        self.ws.emit(value)

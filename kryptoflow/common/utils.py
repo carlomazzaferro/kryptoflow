@@ -2,7 +2,7 @@ import json
 import math
 import sys
 from kryptoflow.definitions import CONFIG_PATH
-from datetime import datetime, time
+from datetime import datetime
 import time as t
 from threading import Timer
 from kryptoflow.definitions import TIMEFRAME

@@ -1,9 +1,10 @@
 import os
-from kryptoflow.managers.project import ProjectManager
-import click
+import sys
 import logging
 import shutil
-import sys
+
+import click
+from kryptoflow.managers.project import ProjectManager
 
 _logger = logging.getLogger('root')
 
