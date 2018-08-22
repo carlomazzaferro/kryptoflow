@@ -9,38 +9,69 @@
 """
 
 from setuptools import setup, find_packages
+from pathlib import Path  # noqa
 
-# Add here console scripts and other entry points in ini-style format
+NAME = 'kryptoflow'
+README = Path('README.md')
+EXTENSIONS = {
+    'aws',
+    'tf',
+    'tf_gpu'
+}
+
+
+def strip_comments(l):
+    return l.split('#', 1)[0].strip()
+
+
+def _pip_requirement(req, *root):
+    if req.startswith('-r '):
+        _, path = req.split()
+        return reqs(*root, *path.split('/'))
+    return [req]
+
+
+def _reqs(*f):
+    path = (Path.cwd() / 'requirements').joinpath(*f)
+    with path.open() as fh:
+        reqs = [strip_comments(l) for l in fh.readlines()]
+        return [_pip_requirement(r, *f[:-1]) for r in reqs if r]
+
+
+def reqs(*f):
+    return [req for subreq in _reqs(*f) for req in subreq]
+
+
+def extras(*p):
+    """Parse requirement in the requirements/extras/ directory."""
+    return reqs('extras', *p)
+
+
+def extras_require():
+    """Get map of all extra requirements."""
+    return {x: extras(x + '.txt') for x in EXTENSIONS}
+
+
+# -*- Long Description -*-
+
+
+if README.exists():
+    long_description = README.read_text(encoding='utf-8')
+else:
+    long_description = 'See http://pypi.org/project/{}'.format(NAME)
+
+# -*- Install Requires -*-
+
+
+install_requires = reqs('default.txt')
 
 
 def setup_package():
     setup(version='0.3.0',
           include_package_data=True,
-          install_requires=[
-              'confluent-kafka==0.11.4',
-              'avro-python3',
-              'rx==1.6.1',
-              'tweepy',
-              'ws4py',
-              'praw',
-              'scipy',
-              'pandas',
-              'nltk',
-              'joblib',
-              'keras',
-              'pyyaml',
-              'tweet-preprocessor==0.5.0',
-              'tensorflow',
-              'docker',
-              'scikit-learn',
-              'sortedcontainers',
-              'kafka-tfrx',
-              'Flask==0.12.2',
-              'flask-restplus==0.10.1',
-              'flask-socketio',
-              'flask-cors',
-              'kafka-tfrx',
-              'rx'],
+          install_requires=install_requires,
+          tests_require=reqs('test.txt'),
+          extras_require=extras_require(),
           keywords=[
               'kryptoflow',
               'tensorFlow',
@@ -65,10 +96,7 @@ def setup_package():
           dependency_links=['git+git://github.com/Supervisor/supervisor.git@4.0.0.dev0#egg=supervisor4.0.0.dev0',
                             'git+git://github.com/danpaquin/gdax-python.git@1.0.6#egg=gdax-1.0.6'],
 
-          tests_require=['pytest', 'pytest-cov', 'pytest-runner', 'python-coveralls'],
           packages=find_packages(),
-          # data_files=[os.path.join('kryptoflow/docker/', i) for i in os.listdir('kryptoflow/docker')]
-
           )
 
 
