@@ -7,9 +7,9 @@ import logging
 import docker
 from typing import Union
 from sklearn.base import BaseEstimator
-from keras.engine.training import Model as KerasBaseModel
-from keras import backend as K
-from keras.models import model_from_json
+from tensorflow.keras import Model as KerasBaseModel
+from tensorflow.keras import backend as K
+from tensorflow.keras.models import model_from_json
 from tensorflow.python.saved_model import builder as saved_model_builder, tag_constants
 from tensorflow.python.saved_model.signature_def_utils_impl import predict_signature_def
 
@@ -80,7 +80,7 @@ class KerasModel(Model):
 
     def load(self, run_number: Union[str, int]='last', name: str='sklearn'):
         """
-        Load a keras/tf model from pickled instance
+        Load a keras/tf.txt model from pickled instance
 
         Args:
             run_number: 'last' or integer value representing the run number
@@ -119,7 +119,7 @@ class KerasModel(Model):
         loaded_model = model_from_json(json_model_file)
         loaded_model.load_weights(os.path.join(self.model_path, name + '.h5'))
 
-        builder = saved_model_builder.SavedModelBuilder(os.path.join(self.model_path, 'tf'))
+        builder = saved_model_builder.SavedModelBuilder(os.path.join(self.model_path, 'tf.txt'))
         signature = predict_signature_def(inputs={'states': loaded_model.input},
                                           outputs={'price': loaded_model.output})
 
@@ -128,7 +128,7 @@ class KerasModel(Model):
                                              signature_def_map={'predict': signature})
         builder.save()
 
-        _logger.info("Saved tf model to disk")
+        _logger.info("Saved tf.txt model to disk")
 
 
 class TrainableModel(object):
@@ -152,13 +152,13 @@ class ServableModel(Model):
     def __init__(self, model_type: str, model_number: int):
         super().__init__(model_type=model_type)
         self.number = model_number
-        self.model_dir = {'keras': os.path.join(self.model_path, 'tf/.'),
+        self.model_dir = {'keras': os.path.join(self.model_path, 'tf.txt/.'),
                           'sklearn': self.model_path}[self.model_type]
 
         check_model_type(model_type=model_type)
 
     def copy_to_container(self):
-        ctr_name = 'tf-serving'
+        ctr_name = 'tf.txt-serving'
         model_final_dest = os.path.join('/serving/', self.model_type, str(self.number))
 
         mv_cmd = ('docker exec %s mkdir -p %s' % (ctr_name, model_final_dest)).split()
@@ -168,7 +168,7 @@ class ServableModel(Model):
 
     def serve(self):
         client = docker.from_env()
-        serving = client.containers.get('tf-serving')
+        serving = client.containers.get('tf.txt-serving')
         execute = serving.exec_run(cmd=['tensorflow_model_server',
                                         '--port=9000',
                                         '--model_base_path=%s' % os.path.join('/serving/', self.model_type),

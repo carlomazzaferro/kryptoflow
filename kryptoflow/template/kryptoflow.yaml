@@ -7,6 +7,13 @@ logging:
 
 saved-models: 'serialized'
 
+
+# Backup config
+backup:
+  AWS_bucket: false
+  local: kafka/backups
+
+
 # Dashborad config
 dashboard:   
   FLASK_SERVER_NAME: '0.0.0.0'
@@ -20,7 +27,7 @@ restplus:
   RESTPLUS_MASK_SWAGGER: False
   RESTPLUS_ERROR_404_HELP: False
 
-# tf client semn ,ttings
+# tf.txt client semn ,ttings
 tensorflow:
   TF_SERVER_NAME: '172.17.0.2'
   TF_SERVER_PORT: 9000
@@ -33,3 +40,11 @@ tensorflow:
 vueapp:
   DIST_FILES_DIR: 'dist'
   STATIC_FILES_DIR: 'dist/assets'
+
+
+kafka:
+  url: 'localhost'
+  port: 9092
+
+s3:
+  bucket: 'kryptoflow'

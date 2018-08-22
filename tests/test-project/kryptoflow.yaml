@@ -1,5 +1,5 @@
 backup:
-  AWS: false
+  AWS_bucket: false
   local: kafka/backups
 dashboard:
   FLASK_DEBUG: true
