@@ -1,16 +1,12 @@
-import os
 import logging
 
 from datetime import datetime, timedelta
 import pandas
-from keras import backend as K
-from keras.models import model_from_json
-from sklearn.externals import joblib
-from tensorflow.python.saved_model import builder as saved_model_builder, tag_constants
-from tensorflow.python.saved_model.signature_def_utils_impl import predict_signature_def
-from rx import Observable, Observer
+import tensorflow as tf
+import numpy
 
-from kryptoflow.definitions import SAVED_MODELS
+from rx import Observable
+
 from kafka_tfrx.stream import KafkaStream
 from kryptoflow.ml.dataset import one_hot_encode
 
@@ -18,7 +14,7 @@ from kryptoflow.ml.dataset import one_hot_encode
 _logger = logging.getLogger('root')
 
 
-def rows_to_df(rows, categorical=list([])):
+def rows_to_df(rows, categorical=None):
     df = pandas.DataFrame(rows)
     df.index = pandas.to_datetime(df['ts'])
     df['ts'] = pandas.to_datetime(df['ts'])
@@ -31,12 +27,12 @@ def rows_to_df(rows, categorical=list([])):
 
 def stream_from_start(observer):
     stream = KafkaStream.avro_consumer(topic='gdax', offset='start')
-    source = Observable \
+    Observable \
         .from_(stream) \
         .subscribe(observer())
 
 
-def get_historic_data(offset, max_points=50000):
+def get_historic_data(offset, max_points=None):
     stream = KafkaStream.avro_consumer(topic='gdax', offset=offset)
     source = Observable \
         .from_(stream) \
@@ -44,102 +40,77 @@ def get_historic_data(offset, max_points=50000):
                                   datetime.strptime(value['ts'], '%Y-%m-%d %H:%M:%S') > timedelta(seconds=5))
 
     a = source.to_blocking()
-    return [msg for msg in a][-max_points:]
+    if max_points:
+        return [msg for msg in a][-max_points:]
+
+    else:
+        return [msg for msg in a]
 
 
-class ModelImporter(object):
-
-    def __init__(self, model_type='sklearn', latest=True, number=1):
-        self.type = model_type
-        self.latest = latest
-        if self.latest:
-            existing_models = sorted([int(i) for i in os.listdir(SAVED_MODELS)])
-            self.number = existing_models[-1]
-        else:
-            self.number = number
-        self.model_path = os.path.join(SAVED_MODELS, str(self.number), self.type)
-
-    def load(self, name):
-        if self.type == 'sklearn':
-            return joblib.load(os.path.join(self.model_path, name + '.mdl'))
-        elif self.type == 'keras':
-            json_model_file = open(os.path.join(self.model_path, name + '.json'), "r").read()
-            loaded_model = model_from_json(json_model_file)
-            loaded_model.load_weights(os.path.join(self.model_path, name + '.h5'))
+def gen():
+    stream = KafkaStream.avro_consumer(topic='gdax', offset='start')
+    for i in stream:
+        print(i)
+        yield (i['price'], i['volume_24h'], i['spread'], 1 if i['side'] == 'buy' else 0)
 
 
-class ModelExporter(object):
-    """
-    Save model as:
-        - json
-        - Weights: .h5 files;
-        - Protobuf: for loading into TensorFlow Serving
-        - Checkpoints: also for TF Serving
+# TODO: rxpy take fixed amount of points and convert to tensorflow tensor
 
-    The models will live in the directory `stored_models/i/` where i is an integer which is assigned automatically.
-    Within that directory, there will be a `tf` and a `keras` directory, where each of the versions of the serialized
-    model will be stored.
-    """
-    def __init__(self):
-        """
-        Args:
-            model (keras.Model): compiled keras model
-        """
-        self.models_dir = os.path.join(SAVED_MODELS, str(self.path_id))
-        os.mkdir(self.models_dir)
+def make_tf_iterator():
+    import tensorflow as tf
+    import random
 
-    def store(self, model, name, model_type='keras'):
-        if model_type == 'sklearn':
-            self._store_sklearn(name, model)
-        else:
-            self._store_keras(name, model)
-            self._store_tf(name)
+    def preprocess(inputs):
+        print(inputs)
+        x = tf.reshape(tf.cast(numpy.array([inputs]), tf.float32), (4, 1, 1))
+        y = tf.one_hot(tf.cast(random.choice(0, 1), tf.uint8), 2)
+    dataset = tf.data.Dataset.from_generator(gen, output_types=tf.float32, output_shapes=tf.TensorShape((4,1,1)))
+    # value = data.make_one_shot_iterator().get_next()
+    # sess = tf.txt.Session()
+    # print(sess.run(value))  # (1, array([1]))
+    # print(sess.run(value))  # (2, array([1, 1]))
 
-    @property
-    def path_id(self):
-        existing_models = sorted([int(i) for i in os.listdir(SAVED_MODELS)])
-        return existing_models[-1] + 1
+    dataset = dataset.apply(tf.contrib.data.map_and_batch(
+        preprocess, 30))
+    # dataset = dataset.repeat()
+    # dataset = dataset.prefetch(tf.txt.contrib.data.AUTOTUNE)
 
-    @property
-    def sklearn_model_path(self):
-        return os.path.join(self.models_dir, 'sklearn')
+    return dataset
 
-    @property
-    def keras_model_path(self):
-        return os.path.join(self.models_dir, 'keras')
+_EPOCHS      = 5
+_NUM_CLASSES = 10
+_BATCH_SIZE  = 128
 
-    @property
-    def tf_model_path(self):
-        return os.path.join(self.models_dir, 'tf')
 
-    def _store_sklearn(self, name, model):
-        os.mkdir(self.sklearn_model_path)
-        joblib.dump(model, os.path.join(self.sklearn_model_path, name + '.mdl'))
-        _logger.info("Saved sklearn model to disk")
+def training_pipeline():
+    #
+    # (x_train, y_train), (x_test, y_test) = tf.txt.keras.datasets.mnist.load_data()
+    # training_set = tfdata_generator((x_train, y_train), is_training=True, batch_size=_BATCH_SIZE)
+    # testing_set  = tfdata_generator((x_test, y_test), is_training=False, batch_size=_BATCH_SIZE)
+    training_set = make_tf_iterator().make_one_shot_iterator()
+    # #############
+    # Train Model
+    # #############
+    model = keras_model()  # your keras model here
+    model.compile('adam', 'categorical_crossentropy', metrics=['acc'])
+    model.fit(
+        training_set,
+        epochs=10,
+        verbose=1)
 
-    def _store_keras(self, name, model):
-        K.set_learning_phase(0)  # necessary to prevent model from modifying weights
-        os.makedirs(self.keras_model_path)
-        model_json = model.to_json()
-        with open(os.path.join(self.keras_model_path, name + '.json'), 'w') as json_file:
-            json_file.write(model_json)
-        model.save_weights(os.path.join(self.keras_model_path, name + '.h5'))
-        _logger.info("Saved Keras model to disk")
 
-    def _store_tf(self, name):
+def keras_model():
+    from tensorflow.keras.layers import Flatten, Dense, Dropout, Input
 
-        json_model_file = open(os.path.join(self.keras_model_path, name + '.json'), "r").read()
-        loaded_model = model_from_json(json_model_file)
-        loaded_model.load_weights(os.path.join(self.keras_model_path, name + '.h5'))
+    inputs = Input(shape=(4, 1, 1))
+    x = Dense(512, activation='relu')
+    x = Flatten()(x)
+    x = Dense(512, activation='relu')(x)
+    x = Dropout(0.5)(x)
+    outputs = Dense(_NUM_CLASSES, activation='softmax')(x)
 
-        builder = saved_model_builder.SavedModelBuilder(self.tf_model_path)
-        signature = predict_signature_def(inputs={'states': loaded_model.input},
-                                          outputs={'price': loaded_model.output})
+    return tf.keras.Model(inputs, outputs)
 
-        with K.get_session() as sess:
-            builder.add_meta_graph_and_variables(sess=sess,
-                                                 tags=[tag_constants.SERVING],
-                                                 signature_def_map={'predict': signature})
-            builder.save()
 
-        _logger.info("Saved tf model to disk")
+if __name__ == '__main__':
+    training_pipeline()

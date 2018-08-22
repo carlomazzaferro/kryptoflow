@@ -2,7 +2,6 @@ dist: trusty
 sudo: required
 language: python
 python:
-- '3.5'
 - '3.6'
 before-install:
 - apt-get update -y
@@ -11,6 +10,7 @@ before-install:
 - add-apt-repository "deb [arch=amd64] https://packages.confluent.io/deb/4.0 stable
   main"
 - apt-get install -y librdkafka-dev librdkafka1
+- pip install -U pip
 install:
 - pip install tox-travis
 script:

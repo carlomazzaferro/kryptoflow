@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, print_function
 
 import yaml
 import pkgutil
@@ -54,7 +52,7 @@ class BaseConfigManager(object):
 
         if os.path.isfile(config_file_path) and init:
             _logger.debug("%s file already present at %s",
-                         cls.CONFIG_FILE_NAME, config_file_path)
+                          cls.CONFIG_FILE_NAME, config_file_path)
             return
 
         with open(config_file_path, "w") as config_file:

@@ -2,3 +2,4 @@ recursive-include kryptoflow/*.py
 include kryptoflow/template/*
 include kryptoflow/template/kafka/*
 include kryptoflow/template/kafka/logs/*
+recursive-include requirements *.txt
