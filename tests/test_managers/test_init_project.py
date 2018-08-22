@@ -30,9 +30,9 @@ def test_template_exists():
         assert data
 
 
-def test_template_creation(project_manager):
+def test_template_creation():
     runner = CliRunner()
-    result = runner.invoke(cli, ['init', '--path', 'tests', '--name', 'make-money'])
+    runner.invoke(cli, ['init', '--path', 'tests', '--name', 'make-money'])
     for file in TEMPLATE_PROJECT_FILES:
         assert os.path.isfile(os.path.join('tests', file.replace('template', 'make-money')))
     shutil.rmtree('tests/make-money')
@@ -40,8 +40,8 @@ def test_template_creation(project_manager):
 
 def test_template_overriding(monkeypatch):
     runner = CliRunner()
-    result = runner.invoke(cli, ['init', '--path', 'tests', '--name', 'make-money'])
-    result = runner.invoke(cli, ['init', '--path', 'tests', '--name', 'make-money'])
+    runner.invoke(cli, ['init', '--path', 'tests', '--name', 'make-money'])
+    runner.invoke(cli, ['init', '--path', 'tests', '--name', 'make-money'])
     monkeypatch.setattr('builtins.input', lambda x: 'Y')
     for file in TEMPLATE_PROJECT_FILES:
         assert os.path.isfile(os.path.join('tests', file.replace('template', 'make-money')))

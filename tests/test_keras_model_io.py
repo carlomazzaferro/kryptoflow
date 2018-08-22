@@ -9,7 +9,7 @@ from sklearn.datasets import make_classification
 from tensorflow.keras import Model as KerasBaseModel
 from tensorflow.keras import backend as K
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Activation
+from tensorflow.keras.layers import Dense
 from kryptoflow.models.model import KerasModel, TrainableModel
 import shutil
 from kryptoflow.managers.project import ProjectManager
@@ -68,8 +68,8 @@ def test_serialization(keras_model, project_manager):
     skl.store(name='nn')
     assert os.path.exists(os.path.join(skl.model_path, 'nn' + '.h5'))
     assert os.path.exists(os.path.join(skl.model_path, 'nn' + '.json'))
-    assert os.path.exists(os.path.join(skl.model_path, 'tf', 'saved_model' + '.pb'))
-    assert os.path.isdir(os.path.join(skl.model_path, 'tf', 'variables'))
+    assert os.path.exists(os.path.join(skl.model_path, 'tf.txt', 'saved_model' + '.pb'))
+    assert os.path.isdir(os.path.join(skl.model_path, 'tf.txt', 'variables'))
 
     for root, dirs, files in os.walk(project_manager.CONFIG['saved-models']):
         for f in files:
