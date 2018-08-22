@@ -4,6 +4,7 @@ import pytest
 from kryptoflow.managers.constants import TEMPLATE_PROJECT_FILES
 from kryptoflow.managers.base import BaseConfigManager
 from kryptoflow.managers.project import ProjectManager
+from kryptoflow.common.validation import NotInitilizedError
 
 
 def test_default():
@@ -14,10 +15,9 @@ def test_default():
 
 
 def test_project():
-    assert ProjectManager.IS_GLOBAL is False
-    assert ProjectManager.KRYPTOFLOW_DIR is None
-    assert ProjectManager.CONFIG_FILE_NAME == 'kryptoflow.yaml'
-    assert ProjectManager.CONFIG is None
+    ProjectManager.set_path(None)
+    with pytest.raises(NotInitilizedError):
+        ProjectManager.get_models()
 
 
 def test_get_config_file_path():
