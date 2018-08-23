@@ -33,8 +33,9 @@ class ProjectManager(BaseConfigManager):
 
     @classmethod
     def create_subdirs(cls):
-        os.makedirs(os.path.join(cls.KRYPTOFLOW_DIR, 'kafka/logs'))
-        os.makedirs(os.path.join(cls.KRYPTOFLOW_DIR, 'serialized'))
+        paths = ['kafka/logs', 'kafka/backups', 'serialized', 'supervisor']
+        for path in paths:
+            os.makedirs(os.path.join(cls.KRYPTOFLOW_DIR, path), exist_ok=True)
 
     @classmethod
     def get_models(cls):

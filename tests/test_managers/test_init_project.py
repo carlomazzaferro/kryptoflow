@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 
@@ -32,19 +31,20 @@ def test_template_exists():
 
 def test_template_creation():
     runner = CliRunner()
-    runner.invoke(cli, ['init', '--path', 'tests', '--name', 'make-money'])
+    runner.invoke(cli, ['-v', 'init', '--path', 'tests/', '--name', 'make-money'])
+    print(os.listdir('tests/'))
     for file in TEMPLATE_PROJECT_FILES:
-        assert os.path.isfile(os.path.join('tests', file.replace('template', 'make-money')))
+        assert os.path.exists(os.path.join('tests', file.replace('template', 'make-money')))
     shutil.rmtree('tests/make-money')
 
 
 def test_template_overriding(monkeypatch):
     runner = CliRunner()
-    runner.invoke(cli, ['init', '--path', 'tests', '--name', 'make-money'])
-    runner.invoke(cli, ['init', '--path', 'tests', '--name', 'make-money'])
+    result = runner.invoke(cli, ['init', '--path', 'tests', '--name', 'make-money'])
+    assert result.exit_code == 0
+    result = runner.invoke(cli, ['init', '--path', 'tests', '--name', 'make-money'])
+    assert result.exit_code == 1
     monkeypatch.setattr('builtins.input', lambda x: 'Y')
-    for file in TEMPLATE_PROJECT_FILES:
-        assert os.path.isfile(os.path.join('tests', file.replace('template', 'make-money')))
     shutil.rmtree('tests/make-money')
 
 
@@ -56,7 +56,3 @@ def test_safe_init(monkeypatch):
         safe_init('tests/make-money')
 
     assert pytest_wrapped_e.type == SystemExit
-
-    for file in TEMPLATE_PROJECT_FILES:
-        assert os.path.isfile(os.path.join('tests', file.replace('template', 'make-money')))
-    shutil.rmtree('tests/make-money')

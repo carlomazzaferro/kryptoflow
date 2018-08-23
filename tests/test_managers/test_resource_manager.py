@@ -50,6 +50,7 @@ def data():
 
 
 def test_get_backup_resource():
+    ProjectManager.set_path(None)
     with pytest.raises(NotInitilizedError):
         ResourceManager.backup_resources()
     ProjectManager.set_path('tests/test-project')

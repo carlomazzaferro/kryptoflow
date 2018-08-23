@@ -1,5 +1,5 @@
 from gdax import AuthenticatedClient
-from kryptoflow.common.utils import load_conf
+from kryptoflow.managers.secrets import SecretsManager
 
 
 class Trader(object):
@@ -10,7 +10,7 @@ class Trader(object):
             url = "https://api.gdax.com"
         else:
             url = "https://api-public.sandbox.gdax.com"
-        self.auth_client = AuthenticatedClient(**load_conf()['gdax'], api_url=url)
+        self.auth_client = AuthenticatedClient(*SecretsManager.get_value('gdax'), api_url=url)
 
     @property
     def is_authenticated(self):

@@ -1,20 +1,12 @@
-import json
 import math
 import sys
-from kryptoflow.definitions import CONFIG_PATH
 from datetime import datetime
 import time as t
 from threading import Timer
-from kryptoflow.definitions import TIMEFRAME
 import logging
 
 
 _logger = logging.getLogger(__name__)
-
-
-def load_conf():
-    with open(CONFIG_PATH, 'r') as inf:
-        return json.load(inf)
 
 
 def setup_logging(loglevel):
