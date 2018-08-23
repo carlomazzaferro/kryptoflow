@@ -48,3 +48,6 @@ kafka:
 
 s3:
   bucket: 'kryptoflow'
+
+# supervisord
+supervisor: 'supervisor/supervisord.conf'

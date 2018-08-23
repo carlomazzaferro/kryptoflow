@@ -1,5 +1,6 @@
 import os
-from kryptoflow import definitions
+from kryptoflow.managers.project import ProjectManager
+import subprocess
 import click
 
 
@@ -12,7 +13,7 @@ def scrape(monitor):
       args ([str]): command line parameter list
     """
 
-    subprocess.run(['supervisord', '-c', os.path.join(definitions.RESOURCES_PATH, 'supervisord.conf')])
+    subprocess.run(['supervisord', '-c', os.path.join(ProjectManager.get_value('supervisor'), 'supervisord.conf')])
     print(monitor)
     if monitor:
         print('monitoring')

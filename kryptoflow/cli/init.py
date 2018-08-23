@@ -25,7 +25,6 @@ def init(name, path):
 def safe_init(project_path):
     overwrite = input('WARNING: Path specified already exists. Any configuration will be overwritten. Proceed?[Y/n]')
     if overwrite == 'Y':
-        shutil.rmtree(project_path)
         ProjectManager.set_path(project_path)
         ProjectManager.init_project()
     elif overwrite == 'n':

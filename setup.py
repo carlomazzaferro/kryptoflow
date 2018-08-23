@@ -16,7 +16,9 @@ README = Path('README.md')
 EXTENSIONS = {
     'aws',
     'tf',
-    'tf_gpu'
+    'tf_gpu',
+    'nlp',
+    'test'
 }
 
 
@@ -70,7 +72,7 @@ def setup_package():
     setup(version='0.3.0',
           include_package_data=True,
           install_requires=install_requires,
-          tests_require=reqs('test.txt'),
+          tests_require=extras('test.txt'),
           extras_require=extras_require(),
           keywords=[
               'kryptoflow',
@@ -93,8 +95,8 @@ def setup_package():
               'Intended Audience :: Science/Research',
               'Topic :: Scientific/Engineering :: Artificial Intelligence'
           ],
-          dependency_links=['git+git://github.com/Supervisor/supervisor.git@4.0.0.dev0#egg=supervisor4.0.0.dev0',
-                            'git+git://github.com/danpaquin/gdax-python.git@1.0.6#egg=gdax-1.0.6'],
+          dependency_links=['https://github.com/Supervisor/supervisor/tarball/master#egg=supervisor-4.0.0.dev',
+                            'https://github.com/carlomazzaferro/coinbasepro-python/tarball/master#egg=coinbasepro-python-1.1.2'],
 
           packages=find_packages(),
           )

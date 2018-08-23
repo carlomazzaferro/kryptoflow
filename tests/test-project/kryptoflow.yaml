@@ -20,6 +20,7 @@ restplus:
 s3:
   bucket: kryptoflow
 saved-models: tests/test-project/serialized
+supervisor: supervisor/supervisord.conf
 tensorflow:
   TF_MODEL_INPUTS_KEY: states
   TF_MODEL_NAME: default

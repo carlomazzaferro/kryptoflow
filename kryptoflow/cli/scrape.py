@@ -1,19 +1,31 @@
 import subprocess
 import os
-from kryptoflow import definitions
+from kryptoflow.managers.project import ProjectManager
 import click
+from supervisor.supervisord import main
 
 
 @click.command()
 @click.option('--monitor', help='Monitor scraping jobs', is_flag=True)
-def scrape(monitor):
-    """Main entry point allowing external calls
-
-    Args:
-      args ([str]): command line parameter list
+@click.option('--source', help='What to run',  default='all')
+def scrape(monitor, source):
     """
 
-    subprocess.run(['supervisord', '-c', os.path.join(definitions.RESOURCES_PATH, 'supervisord.conf')])
-    print(monitor)
+    Parameters
+    ----------
+    monitor: bool
+        Start supervisord monitoring server
+
+    source: str
+        'all', 'gdax', 'reddit', 'twitter'
+
+    Returns
+    -------
+
+    """
+
+    ProjectManager.set_path('kryptoflow/template')
+    main(['-c', os.path.join(ProjectManager.KRYPTOFLOW_DIR, ProjectManager.get_value('supervisor'))])
     if monitor:
         print('monitoring')
+
