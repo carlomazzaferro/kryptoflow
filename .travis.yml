@@ -12,9 +12,9 @@ before-install:
 - apt-get install -y librdkafka-dev librdkafka1
 install:
 - pip install tox-travis
-- pip install --process-dependency-links -e  .[tf,test]
+- pip install --process-dependency-links -e  .[tf,test,aws]
 script:
-- tox
+- python setup.py test
 after_script:
 - coveralls
 deploy:

@@ -2,10 +2,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 import click
 import logging
-import sys
-from . import dataset
-from . import data_interface
-from . import model
+
 
 __author__ = "Carlo Mazzaferro"
 __copyright__ = "Carlo Mazzaferro"
@@ -15,18 +12,18 @@ _logger = logging.getLogger('root')
 
 
 def load():
-
-    remote_df = data_interface.get_historic_data(offset='start', max_points=None)  # type: pandas.DataFrame
-    pipe = Pipeline([
-
-        ('tr', dataset.ForecastTransformer()),
-        ('scaler', MinMaxScaler()),
-        ('time', dataset.TimeEmbedder(inital_dims=len(remote_df.columns)))
-    ])
-
-    x, y = pipe.fit_transform(remote_df)
-    exp.store(pipe, 'pipeline', model_type='sklearn')
-    return x, y
+    pass
+    # remote_df = data_interface.get_historic_data(offset='start', max_points=None)
+    # pipe = Pipeline([
+    #
+    #     ('tr', dataset.ForecastTransformer()),
+    #     ('scaler', MinMaxScaler()),
+    #     ('time', dataset.TimeEmbedder(inital_dims=len(remote_df.columns)))
+    # ])
+    #
+    # x, y = pipe.fit_transform(remote_df)
+    # exp.store(pipe, 'pipeline', model_type='sklearn')
+    # return x, y
 
 
 @click.command()

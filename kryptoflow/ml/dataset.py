@@ -1,4 +1,3 @@
-import pandas
 import numpy
 from itertools import chain
 from sklearn.base import BaseEstimator, TransformerMixin
