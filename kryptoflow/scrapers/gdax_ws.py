@@ -1,7 +1,8 @@
 import gdax
 from datetime import datetime
-from kryptoflow.common.streamer_base import AvroAsync
-from kryptoflow.scrapers.utilities.utils import utc_to_local
+from kafka_tfrx.stream import KafkaStream
+from kryptoflow.definitions import SCHEMAS
+from kryptoflow.common.utils import utc_to_local, setup_logging
 
 
 class GDAXClient(gdax.WebsocketClient):
@@ -19,7 +20,6 @@ class GDAXClient(gdax.WebsocketClient):
         else:
             message = self._format_message(message)
             self.producer.produce(topic=self.topic, value=message)
-
             self.producer.flush()
 
     def start_stream(self):
@@ -64,6 +64,6 @@ class GDAXClient(gdax.WebsocketClient):
 
 if __name__ == '__main__':
 
-    sink = AvroAsync(topic='gdax')
-    gd = GDAXClient(products=['BTC-USD'], channels=['ticker'], producer=sink.producer())
+    sink = KafkaStream.avro_producer(topic='gdax', ip='localhost', schemas=SCHEMAS)
+    gd = GDAXClient(products=['BTC-USD'], channels=['ticker'], producer=sink)
     gd.start_stream()
