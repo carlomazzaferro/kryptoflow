@@ -1,9 +1,7 @@
-import pandas
-import click
-from . import dataset
-from . import data_interface
-from . import model
 
+import click
+import logging
+from kryptoflow.models.model import ServableModel
 
 __author__ = "Carlo Mazzaferro"
 __copyright__ = "Carlo Mazzaferro"
