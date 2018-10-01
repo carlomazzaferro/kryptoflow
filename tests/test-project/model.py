@@ -1,7 +1,7 @@
-from keras.models import Sequential
-from keras.layers import LSTM, Dense
-from keras.callbacks import TensorBoard
-from keras.optimizers import Adam
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense
+from tensorflow.keras.callbacks import TensorBoard
+from tensorflow.keras.optimizers import Adam
 
 from time import time
 

@@ -1,11 +1,14 @@
+# -*- coding: utf-8 -*-
 
 import click
+
 from kryptoflow.common.utils import setup_logging
 from kryptoflow.cli.train import train
 from kryptoflow.cli.serve import serve
 from kryptoflow.cli.scrape import scrape
 from kryptoflow.cli.version import version
 from kryptoflow.cli.init import init
+from kryptoflow.cli.dashboard import dashboard
 
 
 @click.group()
@@ -28,4 +31,5 @@ cli.add_command(version)
 cli.add_command(init)
 # cli.add_command(tensorboard)
 # cli.add_command(notebook)
-# cli.add_command(dashboard)
+cli.add_command(dashboard)
+

@@ -15,7 +15,7 @@ kafka/                          # Kafka logs, data and config files
     count-messages.sh
     server.properties
     set_topics_config.sh
-serialized/                     # Directory where your serialized tf/sklearn/keras models are stored
+serialized/                     tf.txt
 docker-compose.yaml             # Docker configuration for kafka and related services
 Dockerfile.tfserving            # Docker configuration for tensorflow serving
 kryptoflow.yaml                 # Project configuration
