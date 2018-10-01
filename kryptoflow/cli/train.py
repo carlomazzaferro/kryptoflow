@@ -1,13 +1,16 @@
-
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MinMaxScaler
 import click
 import logging
-from kryptoflow.models.model import ServableModel
+
 
 __author__ = "Carlo Mazzaferro"
 __copyright__ = "Carlo Mazzaferro"
 __license__ = "none"
 
 _logger = logging.getLogger('root')
+
+
 
 
 def load():
