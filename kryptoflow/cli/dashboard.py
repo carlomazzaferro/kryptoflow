@@ -6,7 +6,7 @@ import click
 
 @click.command()
 @click.option('--monitor', help='Monitor scraping jobs', is_flag=True)
-def scrape(monitor):
+def dashboard(monitor):
     """Main entry point allowing external calls
 
     Args:
