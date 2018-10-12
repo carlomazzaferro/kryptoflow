@@ -1,26 +1,12 @@
-import logging
-
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import MinMaxScaler
 import click
-<<<<<<< Updated upstream
 import logging
 
-=======
-import pandas
-
-from . import dataset
-from . import data_interface
-from . import model
->>>>>>> Stashed changes
 
 __author__ = "Carlo Mazzaferro"
 __copyright__ = "Carlo Mazzaferro"
 __license__ = "none"
 
 _logger = logging.getLogger('root')
-
-
 
 
 def load():

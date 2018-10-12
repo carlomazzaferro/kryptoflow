@@ -43,10 +43,3 @@ MANIFEST
 
 # secrets
 secrets.yaml
-
-# supervisor
-*.pid
-*.log
-
-# kafka
-kafka/logs/*
