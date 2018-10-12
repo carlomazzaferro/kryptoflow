@@ -11,6 +11,7 @@ kafka-tfrx
 Flask>=1.0
 flask-restplus==0.10.1
 flask-cors
+Flask-SocketIO==3.0.0
 docker
 rx
 six>=1.11.0

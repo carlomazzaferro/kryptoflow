@@ -2,14 +2,12 @@ from typing import Union, Iterable, AnyStr
 import logging
 
 from datetime import datetime, timedelta
-import pandas
 import tensorflow as tf
 import numpy
 
 from rx import Observable
 
 from kafka_tfrx.stream import KafkaStream
-from kryptoflow.ml.dataset import one_hot_encode
 
 
 _logger = logging.getLogger('root')

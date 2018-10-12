@@ -56,3 +56,4 @@ def test_safe_init(monkeypatch):
         safe_init('tests/make-money')
 
     assert pytest_wrapped_e.type == SystemExit
+    shutil.rmtree('tests/make-money')
