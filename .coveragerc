@@ -1,10 +1,15 @@
 # .coveragerc to control coverage.py
 [run]
 omit =
+    # project template
+    kryptoflow/template/*
     # omit tf serving (third party)
     kryptoflow/api/tensorflow_serving/*
     # omit keras model
     kryptoflow/ml/model.py
+    # omit ws impl (third party)
+    kryptoflow/ws/*
+
     *__init__.py*
 
 [report]

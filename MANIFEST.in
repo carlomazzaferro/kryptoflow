@@ -2,4 +2,8 @@ recursive-include kryptoflow/*.py
 include kryptoflow/template/*
 include kryptoflow/template/kafka/*
 include kryptoflow/template/kafka/logs/*
+include kryptoflow/template/backups/*
+include kryptoflow/template/supervisor/*
+include kryptoflow/template/dist/*
+include kryptoflow/template/dist/assets/*
 recursive-include requirements *.txt

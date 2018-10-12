@@ -24,7 +24,7 @@ supervisor: supervisor/supervisord.conf
 tensorflow:
   TF_MODEL_INPUTS_KEY: states
   TF_MODEL_NAME: default
-  TF_MODEL_SIGNATURE_NAME: predict
+  TF_MODEL_SIGNATURE_NAME: helpers
   TF_SERVER_NAME: 172.17.0.2
   TF_SERVER_PORT: 9000
 version: 1

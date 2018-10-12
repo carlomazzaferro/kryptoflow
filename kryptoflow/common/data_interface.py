@@ -1,3 +1,4 @@
+from typing import Union, Iterable, AnyStr
 import logging
 
 from datetime import datetime, timedelta
@@ -14,37 +15,30 @@ from kryptoflow.ml.dataset import one_hot_encode
 _logger = logging.getLogger('root')
 
 
-def rows_to_df(rows, categorical=None):
-    df = pandas.DataFrame(rows)
-    df.index = pandas.to_datetime(df['ts'])
-    df['ts'] = pandas.to_datetime(df['ts'])
-    df['time_diff'] = df['ts'].diff().dt.seconds.div(1, fill_value=0)
-    if categorical:
-        df = one_hot_encode(df, categorical)
-    df = df.drop('ts', 1)
-    return df
+class StreamFactory(object):
 
+    STREAMS = KafkaStream.avro_consumer(topic='gdax', offset='start')
 
-def stream_from_start(observer):
-    stream = KafkaStream.avro_consumer(topic='gdax', offset='start')
-    Observable \
-        .from_(stream) \
-        .subscribe(observer())
+    @classmethod
+    def stream_from_datetime(cls, start_time: datetime.date, stream_from: Union[Iterable, AnyStr]):
+        stream = cls.STREAMS if stream_from == 'kafka' else stream_from
+        return Observable \
+                    .from_(stream) \
+                    .filter(lambda value: datetime.strptime(value['ts'], '%Y-%m-%d %H:%M:%S') > start_time)
 
+    @classmethod
+    def stream_from_start(cls, stream_from: Union[Iterable, AnyStr]):
+        stream = cls.STREAMS if stream_from == 'kafka' else stream_from
+        return Observable \
+                    .from_(stream)
 
-def get_historic_data(offset, max_points=None):
-    stream = KafkaStream.avro_consumer(topic='gdax', offset=offset)
-    source = Observable \
-        .from_(stream) \
-        .take_while(lambda value: datetime.now() -
-                                  datetime.strptime(value['ts'], '%Y-%m-%d %H:%M:%S') > timedelta(seconds=5))
-
-    a = source.to_blocking()
-    if max_points:
-        return [msg for msg in a][-max_points:]
-
-    else:
-        return [msg for msg in a]
+    @classmethod
+    def stream_from_offset(cls, offset, stream_from: Union[Iterable, AnyStr]):
+        stream = cls.STREAMS if stream_from == 'kafka' else stream_from
+        return Observable \
+                    .from_(stream) \
+                    .take_while(lambda value: datetime.now() -
+                                              datetime.strptime(value['ts'], '%Y-%m-%d %H:%M:%S') > timedelta(seconds=5))
 
 
 def gen():
@@ -82,7 +76,7 @@ _NUM_CLASSES = 10
 _BATCH_SIZE  = 128
 
 
-def training_pipeline():
+def training_pipeline():  # pragma: no cover
     #
     # (x_train, y_train), (x_test, y_test) = tf.txt.keras.datasets.mnist.load_data()
     # training_set = tfdata_generator((x_train, y_train), is_training=True, batch_size=_BATCH_SIZE)
@@ -99,7 +93,7 @@ def training_pipeline():
         verbose=1)
 
 
-def keras_model():
+def keras_model():  # pragma: no cover
     from tensorflow.keras.layers import Flatten, Dense, Dropout, Input
 
     inputs = Input(shape=(4, 1, 1))

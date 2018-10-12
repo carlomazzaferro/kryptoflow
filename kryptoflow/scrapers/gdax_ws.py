@@ -1,11 +1,11 @@
-import gdax
+from kryptoflow.ws.client import WebsocketClient
 from datetime import datetime
 from kafka_tfrx.stream import KafkaStream
 from kryptoflow.definitions import SCHEMAS
 from kryptoflow.common.utils import utc_to_local, setup_logging
 
 
-class GDAXClient(gdax.WebsocketClient):
+class GDAXClient(WebsocketClient):
 
     def __init__(self, products=None, channels=None, producer=None):
 

@@ -125,7 +125,7 @@ class KerasModel(Model):
 
         builder.add_meta_graph_and_variables(sess=session,
                                              tags=[tag_constants.SERVING],
-                                             signature_def_map={'predict': signature})
+                                             signature_def_map={'helpers': signature})
         builder.save()
 
         _logger.info("Saved tf.txt model to disk")
