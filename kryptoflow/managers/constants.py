@@ -44,8 +44,6 @@ TEMPLATE_PROJECT_FILES = [
     'template/kafka/set_topics_config.sh',
     'template/kafka/server.properties',
     'template/kafka/logs/.gitkeep',
-    'template/kafka/backups/.gitkeep',
-    'template/serialized/.gitkeep',
     'template/supervisor/supervisord.conf',
 
 ]

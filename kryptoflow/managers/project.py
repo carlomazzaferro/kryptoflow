@@ -33,7 +33,7 @@ class ProjectManager(BaseConfigManager):
 
     @classmethod
     def create_subdirs(cls):
-        paths = ['kafka/logs', 'kafka/backups', 'serialized', 'supervisor']
+        paths = ['kafka/logs', 'kafka/backups', 'serialized', 'supervisor', 'dist/assets']
         for path in paths:
             os.makedirs(os.path.join(cls.KRYPTOFLOW_DIR, path), exist_ok=True)
 

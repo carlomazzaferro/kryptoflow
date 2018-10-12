@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import click
 
@@ -29,7 +31,5 @@ cli.add_command(serve)
 cli.add_command(scrape)
 cli.add_command(version)
 cli.add_command(init)
-# cli.add_command(tensorboard)
-# cli.add_command(notebook)
 cli.add_command(dashboard)
 
