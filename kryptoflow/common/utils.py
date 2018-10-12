@@ -15,6 +15,7 @@ def setup_logging(loglevel):
     Args:
       loglevel (int): minimum loglevel for emitting messages
     """
+
     level = logging.DEBUG if loglevel else logging.INFO
 
     logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
