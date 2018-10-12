@@ -11,7 +11,7 @@ kafka:
 kind: experiment
 logging:
   level: INFO
-name: test-project
+name: make-money
 restplus:
   RESTPLUS_ERROR_404_HELP: false
   RESTPLUS_MASK_SWAGGER: false
@@ -19,7 +19,7 @@ restplus:
   RESTPLUS_VALIDATE: true
 s3:
   bucket: kryptoflow
-saved-models: tests/test-project/serialized
+saved-models: tests/make-money/serialized
 supervisor: supervisor/supervisord.conf
 tensorflow:
   TF_MODEL_INPUTS_KEY: states

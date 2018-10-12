@@ -7,7 +7,6 @@ from kryptoflow.managers.project import ProjectManager
 from kryptoflow.managers.resource import (ResourceManager,
                                           LocalDisk,
                                           S3,
-                                          ResourceFactory,
                                           fname_from_object)
 
 
@@ -61,9 +60,9 @@ def test_get_backup_resource():
 def test_do_backup(data):
     ProjectManager.set_path('tests/test-project')
     for message in data:
-        ResourceManager.do_backup(message)
+        ResourceManager._do_backup(message)
     local_backup_path = ResourceManager.backup_resources()[0].path
-    assert len(os.listdir(local_backup_path)) == 5
+    assert len(os.listdir(local_backup_path)) == 8
     assert '2018-08-21 06:21:35.json' in os.listdir(local_backup_path)
 
     for f in os.listdir(local_backup_path):
@@ -73,10 +72,10 @@ def test_do_backup(data):
 def test_get_latest_backup(data):
     ProjectManager.set_path('tests/test-project')
     for message in data:
-        ResourceManager.do_backup(message)
+        ResourceManager._do_backup(message)
 
-    assert isinstance(ResourceManager.get_latest_backup_time(), dict)
-    assert 'LocalDisk' in ResourceManager.get_latest_backup_time().keys()
+    assert isinstance(ResourceManager.get_latest_backups(), dict)
+    assert 'LocalDisk' in ResourceManager.get_latest_backups().keys()
 
     local_backup_path = ResourceManager.backup_resources()[0].path
     for f in os.listdir(local_backup_path):
@@ -85,7 +84,7 @@ def test_get_latest_backup(data):
 
 def test_resource_factory():
     with pytest.raises(ResourcedError):
-        ResourceFactory.get_resource('wrong', 'path')
+        ResourceManager.get_resource('wrong', 'path')
 
 
 @pytest.mark.skipif(b3 is None, reason="test requires boto3")

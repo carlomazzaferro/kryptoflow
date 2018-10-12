@@ -1,0 +1,13 @@
+{"namespace": "reddit.avro",
+ "type": "record",
+ "name": "reddit",
+ "fields": [
+
+     {"name": "sentences", "type": "string"},
+     {"name": "polarity", "type": "float"},
+     {"name": "sentence_count", "type": "int"},
+     {"name": "ts", "type": "string"}
+  ]
+
+}
+

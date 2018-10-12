@@ -1,0 +1,12 @@
+{"namespace": "twitter.avro",
+ "type": "record",
+ "name": "twitter",
+ "fields": [
+
+     {"name": "sentences", "type": "string"},
+     {"name": "polarity", "type": "float"},
+     {"name": "sentence_count", "type": "int"},
+     {"name": "ts", "type": "string"}
+  ]
+}
+

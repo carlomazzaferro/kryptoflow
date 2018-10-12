@@ -9,11 +9,9 @@ scikit-learn
 sortedcontainers
 kafka-tfrx
 Flask>=1.0
-flask-restplus
+flask-restplus==0.10.1
 flask-cors
-kafka-tfrx
 docker
 rx
 six>=1.11.0
 supervisor==4.0.0.dev0
-cbpro==1.1.2
