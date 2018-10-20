@@ -4,8 +4,6 @@ from kryptoflow.managers.base import BaseConfigManager
 from kryptoflow.managers.resource import ResourceManager
 from kryptoflow.common.data_interface import StreamFactory
 
-from datetime import datetime
-
 
 class DataManager(BaseConfigManager):
     DATE_FORMAT = '%Y-%m-%d %H:%M:%S'

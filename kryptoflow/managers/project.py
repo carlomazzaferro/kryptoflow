@@ -7,7 +7,7 @@ from kryptoflow.managers.constants import TEMPLATE_PROJECT_FILES, TEMPLATE_PROJE
 
 
 class ProjectManager(BaseConfigManager):
-    """Manages project configuration .polyaxonproject file."""
+    """Manages project configuration kryptoflow.yaml file."""
 
     IS_GLOBAL = False
     KRYPTOFLOW_DIR = None
