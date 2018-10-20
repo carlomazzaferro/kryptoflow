@@ -1,0 +1,12 @@
+{"namespace": "gdax.avro",
+ "type": "record",
+ "name": "gdax",
+ "fields": [
+
+    {"name": "price", "type": "float"},
+    {"name": "volume_24h", "type": "float"},
+    {"name": "spread", "type": "float"},
+    {"name": "ts", "type": "string"},
+    {"name": "side", "type": "string"}
+    ]
+}

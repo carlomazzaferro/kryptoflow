@@ -1,4 +1,3 @@
-import subprocess
 import os
 from kryptoflow.managers.project import ProjectManager
 import click
@@ -24,7 +23,7 @@ def scrape(monitor, source):
 
     """
 
-    ProjectManager.set_path('kryptoflow/template')
+    ProjectManager.set_path('.')
     main(['-c', os.path.join(ProjectManager.KRYPTOFLOW_DIR, ProjectManager.get_value('supervisor'))])
     if monitor:
         print('monitoring')

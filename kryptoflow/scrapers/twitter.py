@@ -1,6 +1,4 @@
 import tweepy
-from kryptoflow.scrapers.utilities.utils import load_conf
-from kryptoflow.common.streamer_base import AvroAsync
 import json
 from datetime import datetime
 from kryptoflow.scrapers.transforms.sent_analysis import TextAnalyzer, clean_text
@@ -20,12 +18,11 @@ def flags(tweet):
 
 class TwitterStream(tweepy.StreamListener):
 
-    def __init__(self, producer=None):
+    def __init__(self, producer=None, twitter_config=None):
         super(TwitterStream, self).__init__()
         self.topic = 'twitter'
-        consumer_key, consumer_secret, key, secret = load_conf()['twitter'].values()
-        self.auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-        self.auth.set_access_token(key, secret)
+        self.auth = tweepy.OAuthHandler(twitter_config['consumer_key'], twitter_config['consumer_secret'])
+        self.auth.set_access_token(twitter_config['access_token'], twitter_config['access_secret'])
         self.analyzer = TextAnalyzer()
 
         self.producer = producer
@@ -70,9 +67,4 @@ class TwitterStream(tweepy.StreamListener):
                    }
         return message
 
-
-if __name__ == '__main__':
-    sink = AvroAsync(topic='reddit')
-    tweet_stream = TwitterStream(producer=sink.producer())
-    tweet_stream.start()
 

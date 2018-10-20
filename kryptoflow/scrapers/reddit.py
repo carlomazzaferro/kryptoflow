@@ -1,7 +1,5 @@
 import praw
-from kryptoflow.scrapers.utilities.utils import load_conf
-from kryptoflow.common.streamer_base import AvroAsync
-from kryptoflow.scrapers.transforms.sent_analysis import TextAnalyzer, clean_text
+from kryptoflow.scrapers.transforms.sent_analysis import TextAnalyzer
 from datetime import datetime
 from time import time
 
@@ -18,8 +16,11 @@ class RedditStreamer(object):
         'BitcoinBeginners'
     ])
 
-    def __init__(self, producer=None):
-        self.client = praw.Reddit(**load_conf()['reddit'])
+    def __init__(self, producer=None, reddit_config=None):
+        client_id = reddit_config['client_id']
+        client_secret = reddit_config['client_secret']
+        user_agent = reddit_config['user_agent']
+        self.client = praw.Reddit(client_id=client_id, client_secret=client_secret, user_agent=user_agent)
         self.analyzer = TextAnalyzer()
         self.producer = producer
         self.topic = 'reddit'
@@ -52,8 +53,3 @@ class RedditStreamer(object):
         print(message)
         return message
 
-
-if __name__ == '__main__':
-    sink = AvroAsync(topic='reddit')
-    r = RedditStreamer(producer=sink.producer())
-    r.start_stream()

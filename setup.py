@@ -97,8 +97,7 @@ def setup_package():
           ],
           # dependency_links=['https://github.com/Supervisor/supervisor/tarball/master#egg=supervisor-4.0.0.dev',
           #                   'https://github.com/carlomazzaferro/coinbasepro-python/tarball/master#egg=coinbasepro-python-1.1.2'],
-          dependency_links=['git+git://github.com/Supervisor/supervisor.git@master#egg=supervisor-4.0.0.dev',
-                            'git+git://github.com/carlomazzaferro/coinbasepro-python.git@master#egg=cbpro-1.1.2'],
+          dependency_links=['git+git://github.com/Supervisor/supervisor.git@master#egg=supervisor-4.0.0.dev'],
 
 
           packages=find_packages(),

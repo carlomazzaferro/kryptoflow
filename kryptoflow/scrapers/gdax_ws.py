@@ -1,8 +1,6 @@
 from kryptoflow.ws.client import WebsocketClient
 from datetime import datetime
-from kafka_tfrx.stream import KafkaStream
-from kryptoflow.definitions import SCHEMAS
-from kryptoflow.common.utils import utc_to_local, setup_logging
+from kryptoflow.common.utils import utc_to_local
 
 
 class GDAXClient(WebsocketClient):
@@ -60,10 +58,3 @@ class GDAXClient(WebsocketClient):
 
     def on_close(self):
         print("-- Goodbye! --")
-
-
-if __name__ == '__main__':
-
-    sink = KafkaStream.avro_producer(topic='gdax', ip='localhost', schemas=SCHEMAS)
-    gd = GDAXClient(products=['BTC-USD'], channels=['ticker'], producer=sink)
-    gd.start_stream()
