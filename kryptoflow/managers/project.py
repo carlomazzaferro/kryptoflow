@@ -1,8 +1,9 @@
 import pkgutil
 import os
 from kryptoflow.common.validation import NotInitilizedError
+from kryptoflow.managers.secrets import SecretsManager
 from kryptoflow.managers.base import BaseConfigManager
-from kryptoflow.managers.constants import TEMPLATE_PROJECT_FILES
+from kryptoflow.managers.constants import TEMPLATE_PROJECT_FILES, TEMPLATE_PROJECT_DIRS
 
 
 class ProjectManager(BaseConfigManager):
@@ -33,8 +34,7 @@ class ProjectManager(BaseConfigManager):
 
     @classmethod
     def create_subdirs(cls):
-        paths = ['kafka/logs', 'kafka/backups', 'serialized', 'supervisor', 'dist/assets']
-        for path in paths:
+        for path in TEMPLATE_PROJECT_DIRS:
             os.makedirs(os.path.join(cls.KRYPTOFLOW_DIR, path), exist_ok=True)
 
     @classmethod
@@ -43,3 +43,8 @@ class ProjectManager(BaseConfigManager):
             raise NotInitilizedError('Project must be initialized first with `kryptoflow init`')
         models = os.listdir(cls.get_value('saved-models'))
         return sorted([int(i) for i in models if i.isnumeric()])
+
+    @classmethod
+    def get_secrets(cls, resource):
+        SecretsManager.KRYPTOFLOW_DIR = cls.KRYPTOFLOW_DIR
+        return SecretsManager.get_value(resource)

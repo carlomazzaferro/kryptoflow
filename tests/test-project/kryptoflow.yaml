@@ -7,6 +7,7 @@ dashboard:
   FLASK_SERVER_PORT: '5000'
 kafka:
   port: 9092
+  schemas: kafka/schemas
   url: localhost
 kind: experiment
 logging:

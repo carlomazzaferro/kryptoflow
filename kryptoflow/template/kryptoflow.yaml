@@ -45,6 +45,7 @@ vueapp:
 kafka:
   url: 'localhost'
   port: 9092
+  schemas: 'kafka/schemas'
 
 s3:
   bucket: 'kryptoflow'

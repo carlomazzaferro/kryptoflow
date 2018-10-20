@@ -1,6 +1,5 @@
-from kryptoflow.managers.project import BaseConfigManager
+from kryptoflow.managers.base import BaseConfigManager
 
 
 class SecretsManager(BaseConfigManager):
-
     CONFIG_FILE_NAME = 'secrets.yaml'

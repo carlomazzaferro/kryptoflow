@@ -34,7 +34,6 @@ class BaseConfigManager(object):
             base_path = os.path.join('.')
         else:
             base_path = cls.KRYPTOFLOW_DIR
-
         return os.path.join(base_path, cls.CONFIG_FILE_NAME)
 
     @classmethod
