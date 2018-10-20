@@ -69,7 +69,7 @@ install_requires = reqs('default.txt')
 
 
 def setup_package():
-    setup(version='0.4.0',
+    setup(version='0.5.0',
           include_package_data=True,
           install_requires=install_requires,
           tests_require=extras('test.txt'),
